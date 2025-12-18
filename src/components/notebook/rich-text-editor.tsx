@@ -5,6 +5,8 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
 import {
     IconBold,
     IconItalic,
@@ -16,11 +18,16 @@ import {
     IconList,
     IconListNumbers,
     IconLink,
-    IconCode
+    IconCode,
+    IconCodeDots
 } from "@tabler/icons-react";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+
+// Create lowlight instance with common languages (includes js, ts, bash, json, sql, yaml)
+const lowlight = createLowlight(common);
 
 interface RichTextEditorProps {
     content: string;
@@ -40,7 +47,12 @@ export function RichTextEditor({
             StarterKit.configure({
                 heading: {
                     levels: [1, 2, 3]
-                }
+                },
+                codeBlock: false // Disable default, use CodeBlockLowlight instead
+            }),
+            CodeBlockLowlight.configure({
+                lowlight,
+                defaultLanguage: "javascript"
             }),
             Underline,
             Link.configure({
@@ -173,14 +185,25 @@ export function RichTextEditor({
                     variant={editor.isActive("code") ? "secondary" : "ghost"}
                     size="icon-xs"
                     onClick={() => editor.chain().focus().toggleCode().run()}
+                    title="Inline Code"
                 >
                     <IconCode className="size-3.5" />
+                </Button>
+                <Button
+                    type="button"
+                    variant={editor.isActive("codeBlock") ? "secondary" : "ghost"}
+                    size="icon-xs"
+                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                    title="Code Block"
+                >
+                    <IconCodeDots className="size-3.5" />
                 </Button>
                 <Button
                     type="button"
                     variant={editor.isActive("link") ? "secondary" : "ghost"}
                     size="icon-xs"
                     onClick={setLink}
+                    title="Link"
                 >
                     <IconLink className="size-3.5" />
                 </Button>

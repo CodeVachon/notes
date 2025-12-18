@@ -18,6 +18,7 @@ import {
     DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
 import { deleteNote } from "@/app/notebook/actions";
+import { HtmlContent } from "./html-content";
 import { cn } from "@/lib/utils";
 import type { Note } from "@/db/schema";
 
@@ -34,10 +35,6 @@ export function NoteCard({ note, onEdit }: NoteCardProps) {
             await deleteNote(note.id);
         });
     };
-
-    // Strip HTML tags for preview
-    const textContent = note.content.replace(/<[^>]*>/g, "").trim();
-    const preview = textContent.slice(0, 150) + (textContent.length > 150 ? "..." : "");
 
     const formattedDate = new Date(note.updatedAt).toLocaleTimeString("en-US", {
         hour: "numeric",
@@ -94,9 +91,9 @@ export function NoteCard({ note, onEdit }: NoteCardProps) {
                 </CardAction>
                 <CardDescription>Updated {formattedDate}</CardDescription>
             </CardHeader>
-            {preview && (
+            {note.content && (
                 <CardContent>
-                    <p className="text-muted-foreground line-clamp-3 text-xs">{preview}</p>
+                    <HtmlContent content={note.content} className="text-sm" />
                 </CardContent>
             )}
         </Card>

@@ -32,9 +32,9 @@ export function NotebookClientWrapper({
                     <nav className="flex-1 overflow-y-auto p-4">
                         <SidebarCalendar datesWithContent={datesWithContent} />
                     </nav>
-                    <Separator />
                     <div className="space-y-1 p-2">
                         <CommandPaletteTrigger />
+                    <Separator />
                         <UserMenu user={user} />
                     </div>
                 </aside>

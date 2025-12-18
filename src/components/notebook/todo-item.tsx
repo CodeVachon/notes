@@ -11,6 +11,7 @@ import {
     DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
 import { PriorityBadge } from "./priority-badge";
+import { HtmlContent } from "./html-content";
 import { toggleTodo, deleteTodo } from "@/app/notebook/actions";
 import { formatTimeForDisplay } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
@@ -68,9 +69,10 @@ export function TodoItem({ todo, onEdit }: TodoItemProps) {
                             {optimisticTodo.title}
                         </p>
                         {optimisticTodo.description && (
-                            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
-                                {optimisticTodo.description}
-                            </p>
+                            <HtmlContent
+                                content={optimisticTodo.description}
+                                className="mt-1 text-xs [&_pre]:my-1 [&_pre]:p-2"
+                            />
                         )}
                     </div>
 

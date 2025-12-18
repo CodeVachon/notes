@@ -4,8 +4,8 @@ import { useState, useTransition } from "react";
 import { IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { RichTextEditor } from "./rich-text-editor";
 import {
     Select,
     SelectTrigger,
@@ -43,15 +43,23 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
 
     const isEditing = !!todo;
 
+    // Check if HTML content is effectively empty
+    const isEmptyHtml = (html: string) => {
+        const stripped = html.replace(/<[^>]*>/g, "").trim();
+        return !stripped;
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim()) return;
+
+        const cleanDescription = isEmptyHtml(description) ? null : description;
 
         startTransition(async () => {
             if (isEditing) {
                 await updateTodo(todo.id, {
                     title: title.trim(),
-                    description: description.trim() || null,
+                    description: cleanDescription,
                     priority,
                     dueTime: dueTime || null
                 });
@@ -59,7 +67,7 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
                 await createTodo({
                     date,
                     title: title.trim(),
-                    description: description.trim() || undefined,
+                    description: cleanDescription || undefined,
                     priority,
                     dueTime: dueTime || null
                 });
@@ -88,7 +96,7 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
             ) : (
                 <AlertDialogTrigger render={defaultTrigger} />
             )}
-            <AlertDialogContent className="max-w-md">
+            <AlertDialogContent className="max-w-lg">
                 <AlertDialogHeader>
                     <AlertDialogTitle>{isEditing ? "Edit Todo" : "Add Todo"}</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -111,13 +119,12 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="description">Description (optional)</Label>
-                        <Textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                        <Label>Description (optional)</Label>
+                        <RichTextEditor
+                            content={description}
+                            onChange={setDescription}
                             placeholder="Add more details..."
-                            rows={2}
+                            className="min-h-[120px]"
                         />
                     </div>
 
