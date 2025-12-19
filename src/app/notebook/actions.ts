@@ -6,6 +6,7 @@ import { eq, and, sql, asc } from "drizzle-orm";
 import { db } from "@/db";
 import { note, todo, comment, type TodoPriority } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { syncContentTags } from "@/app/tags/actions";
 
 // Helper to get authenticated user
 async function getUser() {
@@ -36,6 +37,9 @@ export async function createNote(data: { date: string; title: string; content: s
         })
         .returning();
 
+    // Sync tags from content
+    await syncContentTags(user.id, data.content, "note", result[0].id);
+
     revalidatePath(`/notebook/${data.date}`);
     revalidatePath("/notebook");
     return result[0];
@@ -54,6 +58,10 @@ export async function updateNote(noteId: string, data: { title?: string; content
         .returning();
 
     if (result[0]) {
+        // Sync tags from content if content was updated
+        if (data.content !== undefined) {
+            await syncContentTags(user.id, data.content, "note", noteId);
+        }
         revalidatePath(`/notebook/${result[0].date}`);
         revalidatePath("/notebook");
     }
@@ -110,6 +118,11 @@ export async function createTodo(data: {
         })
         .returning();
 
+    // Sync tags from description if provided
+    if (data.description) {
+        await syncContentTags(user.id, data.description, "todo", result[0].id);
+    }
+
     revalidatePath(`/notebook/${data.date}`);
     revalidatePath("/notebook");
     return result[0];
@@ -144,6 +157,10 @@ export async function updateTodo(
         .returning();
 
     if (result[0]) {
+        // Sync tags from description if description was updated
+        if (data.description !== undefined) {
+            await syncContentTags(user.id, data.description ?? "", "todo", todoId);
+        }
         revalidatePath(`/notebook/${result[0].date}`);
         revalidatePath("/notebook");
     }
@@ -228,11 +245,7 @@ export async function getDatesWithContent() {
 
 // ============ Comments Actions ============
 
-export async function createComment(data: {
-    content: string;
-    todoId?: string;
-    noteId?: string;
-}) {
+export async function createComment(data: { content: string; todoId?: string; noteId?: string }) {
     const user = await getUser();
     const id = crypto.randomUUID();
 
@@ -251,6 +264,9 @@ export async function createComment(data: {
         })
         .returning();
 
+    // Sync tags from comment content
+    await syncContentTags(user.id, data.content, "comment", result[0].id);
+
     revalidatePath("/notebook");
     return result[0];
 }
@@ -266,6 +282,11 @@ export async function updateComment(commentId: string, data: { content: string }
         })
         .where(and(eq(comment.id, commentId), eq(comment.userId, user.id)))
         .returning();
+
+    if (result[0]) {
+        // Sync tags from comment content
+        await syncContentTags(user.id, data.content, "comment", commentId);
+    }
 
     revalidatePath("/notebook");
     return result[0];
@@ -308,8 +329,14 @@ export async function getCommentsForDate(date: string) {
 
     // Get all todos and notes for this date
     const [dateTodos, dateNotes] = await Promise.all([
-        db.select({ id: todo.id }).from(todo).where(and(eq(todo.userId, user.id), eq(todo.date, date))),
-        db.select({ id: note.id }).from(note).where(and(eq(note.userId, user.id), eq(note.date, date)))
+        db
+            .select({ id: todo.id })
+            .from(todo)
+            .where(and(eq(todo.userId, user.id), eq(todo.date, date))),
+        db
+            .select({ id: note.id })
+            .from(note)
+            .where(and(eq(note.userId, user.id), eq(note.date, date)))
     ]);
 
     const todoIds = dateTodos.map((t) => t.id);

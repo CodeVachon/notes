@@ -1,19 +1,9 @@
 "use client";
 
 import { useState, useTransition, useOptimistic, useEffect } from "react";
-import {
-    IconChevronDown,
-    IconMessage,
-    IconTrash,
-    IconPencil,
-    IconPlus
-} from "@tabler/icons-react";
+import { IconChevronDown, IconMessage, IconTrash, IconPencil, IconPlus } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import {
-    Collapsible,
-    CollapsibleTrigger,
-    CollapsibleContent
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -167,8 +157,7 @@ export function CommentSection({ comments: initialComments, todoId, noteId }: Co
             <div className="text-muted-foreground mt-2 flex items-center gap-1.5 text-xs">
                 <IconMessage className="size-3.5" />
                 <span>
-                    {initialComments.length}{" "}
-                    {initialComments.length === 1 ? "comment" : "comments"}
+                    {initialComments.length} {initialComments.length === 1 ? "comment" : "comments"}
                 </span>
                 <IconChevronDown className="size-3.5" />
             </div>
@@ -262,10 +251,7 @@ export function CommentSection({ comments: initialComments, todoId, noteId }: Co
             <CollapsibleContent className="mt-2 space-y-3">
                 <div className="space-y-3">
                     {optimisticComments.map((comment) => (
-                        <div
-                            key={comment.id}
-                            className="bg-muted/50 group rounded-md p-2 text-sm"
-                        >
+                        <div key={comment.id} className="bg-muted/50 group rounded-md p-2 text-sm">
                             <HtmlContent
                                 content={comment.content}
                                 className="text-sm [&_pre]:my-1 [&_pre]:p-2 [&_pre]:text-xs"

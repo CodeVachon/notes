@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -8,6 +9,11 @@ import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { Extension, textblockTypeInputRule, markInputRule } from "@tiptap/core";
 import { common, createLowlight } from "lowlight";
+import {
+    createTagSuggestionExtension,
+    TagSuggestionPopup,
+    type TagSuggestionState
+} from "./extensions/tag-suggestion";
 
 // Custom extension to add markdown shortcuts for code blocks
 const MarkdownCodeShortcuts = Extension.create({
@@ -121,6 +127,14 @@ export function RichTextEditor({
     className,
     compact = false
 }: RichTextEditorProps) {
+    const [tagSuggestionState, setTagSuggestionState] = useState<TagSuggestionState | null>(null);
+
+    // Create the tag suggestion extension with state callback
+    const tagSuggestionExtension = useMemo(
+        () => createTagSuggestionExtension(setTagSuggestionState),
+        []
+    );
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -132,6 +146,7 @@ export function RichTextEditor({
                 defaultLanguage: "sql"
             }),
             MarkdownCodeShortcuts,
+            tagSuggestionExtension,
             Underline,
             Link.configure({
                 openOnClick: false,
@@ -158,6 +173,25 @@ export function RichTextEditor({
         }
     });
 
+    // Handle tag selection - replace [[query with [[tagname]]
+    const handleTagSelect = useCallback(
+        (tagName: string) => {
+            if (!editor || !tagSuggestionState) return;
+
+            const { from, to } = tagSuggestionState;
+
+            // Replace the [[query with [[tagname]]
+            editor.chain().focus().deleteRange({ from, to }).insertContent(`[[${tagName}]]`).run();
+
+            setTagSuggestionState(null);
+        },
+        [editor, tagSuggestionState]
+    );
+
+    const handleTagClose = useCallback(() => {
+        setTagSuggestionState(null);
+    }, []);
+
     if (!editor) {
         return null;
     }
@@ -177,7 +211,7 @@ export function RichTextEditor({
     };
 
     return (
-        <div className={cn("rounded-lg border", className)}>
+        <div className={cn("relative rounded-lg border", className)}>
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-0.5 border-b p-1">
                 <Button
@@ -219,7 +253,9 @@ export function RichTextEditor({
 
                         <Button
                             type="button"
-                            variant={editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"}
+                            variant={
+                                editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"
+                            }
                             size="icon-xs"
                             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                         >
@@ -227,7 +263,9 @@ export function RichTextEditor({
                         </Button>
                         <Button
                             type="button"
-                            variant={editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"}
+                            variant={
+                                editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"
+                            }
                             size="icon-xs"
                             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                         >
@@ -235,7 +273,9 @@ export function RichTextEditor({
                         </Button>
                         <Button
                             type="button"
-                            variant={editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"}
+                            variant={
+                                editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"
+                            }
                             size="icon-xs"
                             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
                         >
@@ -298,6 +338,15 @@ export function RichTextEditor({
 
             {/* Editor */}
             <EditorContent editor={editor} />
+
+            {/* Tag Suggestion Popup */}
+            {tagSuggestionState && (
+                <TagSuggestionPopup
+                    query={tagSuggestionState.query}
+                    onSelect={handleTagSelect}
+                    onClose={handleTagClose}
+                />
+            )}
         </div>
     );
 }

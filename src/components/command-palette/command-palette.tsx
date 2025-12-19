@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { useCommandPalette } from "./command-palette-provider";
+import { useMounted } from "@/lib/use-mounted";
 import { getTodayString, getYesterdayString, getTomorrowString } from "@/lib/date-utils";
 import { parseDateInput } from "@/lib/date-parser";
 import { createTodo, createNote } from "@/app/notebook/actions";
@@ -261,6 +262,7 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
 export function CommandPalette() {
     const pathname = usePathname();
     const { isOpen, closePalette } = useCommandPalette();
+    const mounted = useMounted();
 
     // Extract current date from URL
     const currentDate = pathname.match(/\/notebook\/(\d{4}-\d{2}-\d{2})/)?.[1] ?? getTodayString();
@@ -273,6 +275,11 @@ export function CommandPalette() {
         },
         [closePalette]
     );
+
+    // Don't render on server to avoid hydration mismatch with Base UI IDs
+    if (!mounted) {
+        return null;
+    }
 
     // Only render content when open - this ensures fresh state on each open
     return (

@@ -5,3 +5,4 @@ export * from "./verification";
 export * from "./todo";
 export * from "./note";
 export * from "./comment";
+export * from "./tag";

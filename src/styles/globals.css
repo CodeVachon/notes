@@ -128,11 +128,11 @@
 
 /* Code block styling */
 pre {
-    @apply bg-muted rounded-md p-4 overflow-x-auto my-2;
+    @apply bg-muted my-2 overflow-x-auto rounded-md p-4;
 }
 
 pre code {
-    @apply font-mono text-sm bg-transparent p-0;
+    @apply bg-transparent p-0 font-mono text-sm;
 }
 
 /* Syntax highlighting - Light mode */
