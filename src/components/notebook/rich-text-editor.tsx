@@ -34,25 +34,25 @@ interface RichTextEditorProps {
     onChange: (content: string) => void;
     placeholder?: string;
     className?: string;
+    compact?: boolean;
 }
 
 export function RichTextEditor({
     content,
     onChange,
     placeholder = "Start writing...",
-    className
+    className,
+    compact = false
 }: RichTextEditorProps) {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
-                heading: {
-                    levels: [1, 2, 3]
-                },
+                heading: compact ? false : { levels: [1, 2, 3] },
                 codeBlock: false // Disable default, use CodeBlockLowlight instead
             }),
             CodeBlockLowlight.configure({
                 lowlight,
-                defaultLanguage: "javascript"
+                defaultLanguage: "sql"
             }),
             Underline,
             Link.configure({
@@ -72,7 +72,10 @@ export function RichTextEditor({
         },
         editorProps: {
             attributes: {
-                class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[200px] px-3 py-2"
+                class: cn(
+                    "prose prose-sm dark:prose-invert max-w-none focus:outline-none px-3 py-2",
+                    compact ? "min-h-[60px]" : "min-h-[200px]"
+                )
             }
         }
     });
@@ -115,49 +118,53 @@ export function RichTextEditor({
                 >
                     <IconItalic className="size-3.5" />
                 </Button>
-                <Button
-                    type="button"
-                    variant={editor.isActive("underline") ? "secondary" : "ghost"}
-                    size="icon-xs"
-                    onClick={() => editor.chain().focus().toggleUnderline().run()}
-                >
-                    <IconUnderline className="size-3.5" />
-                </Button>
-                <Button
-                    type="button"
-                    variant={editor.isActive("strike") ? "secondary" : "ghost"}
-                    size="icon-xs"
-                    onClick={() => editor.chain().focus().toggleStrike().run()}
-                >
-                    <IconStrikethrough className="size-3.5" />
-                </Button>
+                {!compact && (
+                    <>
+                        <Button
+                            type="button"
+                            variant={editor.isActive("underline") ? "secondary" : "ghost"}
+                            size="icon-xs"
+                            onClick={() => editor.chain().focus().toggleUnderline().run()}
+                        >
+                            <IconUnderline className="size-3.5" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={editor.isActive("strike") ? "secondary" : "ghost"}
+                            size="icon-xs"
+                            onClick={() => editor.chain().focus().toggleStrike().run()}
+                        >
+                            <IconStrikethrough className="size-3.5" />
+                        </Button>
 
-                <Separator orientation="vertical" className="mx-1 h-4" />
+                        <Separator orientation="vertical" className="mx-1 h-4" />
 
-                <Button
-                    type="button"
-                    variant={editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"}
-                    size="icon-xs"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                >
-                    <IconH1 className="size-3.5" />
-                </Button>
-                <Button
-                    type="button"
-                    variant={editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"}
-                    size="icon-xs"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                >
-                    <IconH2 className="size-3.5" />
-                </Button>
-                <Button
-                    type="button"
-                    variant={editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"}
-                    size="icon-xs"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                >
-                    <IconH3 className="size-3.5" />
-                </Button>
+                        <Button
+                            type="button"
+                            variant={editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"}
+                            size="icon-xs"
+                            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                        >
+                            <IconH1 className="size-3.5" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"}
+                            size="icon-xs"
+                            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                        >
+                            <IconH2 className="size-3.5" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"}
+                            size="icon-xs"
+                            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                        >
+                            <IconH3 className="size-3.5" />
+                        </Button>
+                    </>
+                )}
 
                 <Separator orientation="vertical" className="mx-1 h-4" />
 
@@ -169,14 +176,16 @@ export function RichTextEditor({
                 >
                     <IconList className="size-3.5" />
                 </Button>
-                <Button
-                    type="button"
-                    variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
-                    size="icon-xs"
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                >
-                    <IconListNumbers className="size-3.5" />
-                </Button>
+                {!compact && (
+                    <Button
+                        type="button"
+                        variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
+                        size="icon-xs"
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                    >
+                        <IconListNumbers className="size-3.5" />
+                    </Button>
+                )}
 
                 <Separator orientation="vertical" className="mx-1 h-4" />
 
@@ -194,7 +203,7 @@ export function RichTextEditor({
                     variant={editor.isActive("codeBlock") ? "secondary" : "ghost"}
                     size="icon-xs"
                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                    title="Code Block"
+                    title="Code Block (SQL default)"
                 >
                     <IconCodeDots className="size-3.5" />
                 </Button>

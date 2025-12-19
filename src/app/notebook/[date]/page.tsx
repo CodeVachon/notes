@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { DailyHeader } from "@/components/notebook/daily-header";
 import { TodoList } from "@/components/notebook/todo-list";
 import { NoteList } from "@/components/notebook/note-list";
-import { getNotesForDate, getTodosForDate } from "@/app/notebook/actions";
+import { getNotesForDate, getTodosForDate, getCommentsForDate } from "@/app/notebook/actions";
 import { isValidDateString, getTodayString } from "@/lib/date-utils";
 
 interface DailyPageProps {
@@ -19,7 +19,11 @@ export default async function DailyPage({ params }: DailyPageProps) {
     }
 
     // Fetch data in parallel
-    const [todos, notes] = await Promise.all([getTodosForDate(date), getNotesForDate(date)]);
+    const [todos, notes, { todoComments, noteComments }] = await Promise.all([
+        getTodosForDate(date),
+        getNotesForDate(date),
+        getCommentsForDate(date)
+    ]);
 
     return (
         <div className="flex h-full flex-col">
@@ -29,11 +33,11 @@ export default async function DailyPage({ params }: DailyPageProps) {
 
             <div className="flex-1 overflow-y-auto p-6">
                 <div className="mx-auto max-w-3xl space-y-8">
-                    <TodoList todos={todos} date={date} />
+                    <TodoList todos={todos} date={date} todoComments={todoComments} />
 
                     <Separator />
 
-                    <NoteList notes={notes} date={date} />
+                    <NoteList notes={notes} date={date} noteComments={noteComments} />
                 </div>
             </div>
         </div>

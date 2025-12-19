@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { TodoItem } from "./todo-item";
 import { TodoForm } from "./todo-form";
-import type { Todo } from "@/db/schema";
+import type { Todo, Comment } from "@/db/schema";
 
 interface TodoListProps {
     todos: Todo[];
     date: string;
+    todoComments: Record<string, Comment[]>;
 }
 
-export function TodoList({ todos, date }: TodoListProps) {
+export function TodoList({ todos, date, todoComments }: TodoListProps) {
     const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -35,7 +36,12 @@ export function TodoList({ todos, date }: TodoListProps) {
             ) : (
                 <div className="space-y-2">
                     {incompleteTodos.map((todo) => (
-                        <TodoItem key={todo.id} todo={todo} onEdit={(t) => setEditingTodo(t)} />
+                        <TodoItem
+                            key={todo.id}
+                            todo={todo}
+                            comments={todoComments[todo.id] ?? []}
+                            onEdit={(t) => setEditingTodo(t)}
+                        />
                     ))}
 
                     {completedTodos.length > 0 && incompleteTodos.length > 0 && (
@@ -47,7 +53,12 @@ export function TodoList({ todos, date }: TodoListProps) {
                     )}
 
                     {completedTodos.map((todo) => (
-                        <TodoItem key={todo.id} todo={todo} onEdit={(t) => setEditingTodo(t)} />
+                        <TodoItem
+                            key={todo.id}
+                            todo={todo}
+                            comments={todoComments[todo.id] ?? []}
+                            onEdit={(t) => setEditingTodo(t)}
+                        />
                     ))}
                 </div>
             )}

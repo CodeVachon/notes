@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { NoteCard } from "./note-card";
 import { NoteEditorDialog } from "./note-editor-dialog";
-import type { Note } from "@/db/schema";
+import type { Note, Comment } from "@/db/schema";
 
 interface NoteListProps {
     notes: Note[];
     date: string;
+    noteComments: Record<string, Comment[]>;
 }
 
-export function NoteList({ notes, date }: NoteListProps) {
+export function NoteList({ notes, date, noteComments }: NoteListProps) {
     const [editingNote, setEditingNote] = useState<Note | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -32,7 +33,12 @@ export function NoteList({ notes, date }: NoteListProps) {
             ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                     {notes.map((note) => (
-                        <NoteCard key={note.id} note={note} onEdit={(n) => setEditingNote(n)} />
+                        <NoteCard
+                            key={note.id}
+                            note={note}
+                            comments={noteComments[note.id] ?? []}
+                            onEdit={(n) => setEditingNote(n)}
+                        />
                     ))}
                 </div>
             )}

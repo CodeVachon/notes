@@ -4,3 +4,4 @@ export * from "./account";
 export * from "./verification";
 export * from "./todo";
 export * from "./note";
+export * from "./comment";

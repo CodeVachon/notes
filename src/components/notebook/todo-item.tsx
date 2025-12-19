@@ -12,17 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PriorityBadge } from "./priority-badge";
 import { HtmlContent } from "./html-content";
+import { CommentSection } from "./comment-section";
 import { toggleTodo, deleteTodo } from "@/app/notebook/actions";
 import { formatTimeForDisplay } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
-import type { Todo } from "@/db/schema";
+import type { Todo, Comment } from "@/db/schema";
 
 interface TodoItemProps {
     todo: Todo;
+    comments: Comment[];
     onEdit: (todo: Todo) => void;
 }
 
-export function TodoItem({ todo, onEdit }: TodoItemProps) {
+export function TodoItem({ todo, comments, onEdit }: TodoItemProps) {
     const [isPending, startTransition] = useTransition();
     const [optimisticTodo, setOptimisticTodo] = useOptimistic(todo);
 
@@ -74,6 +76,7 @@ export function TodoItem({ todo, onEdit }: TodoItemProps) {
                                 className="mt-1 text-xs [&_pre]:my-1 [&_pre]:p-2"
                             />
                         )}
+                        <CommentSection comments={comments} todoId={todo.id} />
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">

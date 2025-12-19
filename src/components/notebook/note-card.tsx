@@ -19,15 +19,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { deleteNote } from "@/app/notebook/actions";
 import { HtmlContent } from "./html-content";
+import { CommentSection } from "./comment-section";
 import { cn } from "@/lib/utils";
-import type { Note } from "@/db/schema";
+import type { Note, Comment } from "@/db/schema";
 
 interface NoteCardProps {
     note: Note;
+    comments: Comment[];
     onEdit: (note: Note) => void;
 }
 
-export function NoteCard({ note, onEdit }: NoteCardProps) {
+export function NoteCard({ note, comments, onEdit }: NoteCardProps) {
     const [isPending, startTransition] = useTransition();
 
     const handleDelete = () => {
@@ -91,11 +93,12 @@ export function NoteCard({ note, onEdit }: NoteCardProps) {
                 </CardAction>
                 <CardDescription>Updated {formattedDate}</CardDescription>
             </CardHeader>
-            {note.content && (
-                <CardContent>
-                    <HtmlContent content={note.content} className="text-sm" />
-                </CardContent>
-            )}
+            <CardContent>
+                {note.content && <HtmlContent content={note.content} className="text-sm" />}
+                <div onClick={(e) => e.stopPropagation()}>
+                    <CommentSection comments={comments} noteId={note.id} />
+                </div>
+            </CardContent>
         </Card>
     );
 }

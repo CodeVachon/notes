@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { eq, and, sql, asc } from "drizzle-orm";
 import { db } from "@/db";
-import { note, todo, type TodoPriority } from "@/db/schema";
+import { note, todo, comment, type TodoPriority } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 // Helper to get authenticated user
@@ -219,4 +219,122 @@ export async function getDatesWithContent() {
     const allDates = new Set([...noteDates.map((n) => n.date), ...todoDates.map((t) => t.date)]);
 
     return Array.from(allDates);
+}
+
+// ============ Comments Actions ============
+
+export async function createComment(data: {
+    content: string;
+    todoId?: string;
+    noteId?: string;
+}) {
+    const user = await getUser();
+    const id = crypto.randomUUID();
+
+    if (!data.todoId && !data.noteId) {
+        throw new Error("Comment must be attached to a todo or note");
+    }
+
+    const result = await db
+        .insert(comment)
+        .values({
+            id,
+            userId: user.id,
+            content: data.content,
+            todoId: data.todoId ?? null,
+            noteId: data.noteId ?? null
+        })
+        .returning();
+
+    revalidatePath("/notebook");
+    return result[0];
+}
+
+export async function updateComment(commentId: string, data: { content: string }) {
+    const user = await getUser();
+
+    const result = await db
+        .update(comment)
+        .set({
+            content: data.content,
+            updatedAt: new Date()
+        })
+        .where(and(eq(comment.id, commentId), eq(comment.userId, user.id)))
+        .returning();
+
+    revalidatePath("/notebook");
+    return result[0];
+}
+
+export async function deleteComment(commentId: string) {
+    const user = await getUser();
+
+    const deleted = await db
+        .delete(comment)
+        .where(and(eq(comment.id, commentId), eq(comment.userId, user.id)))
+        .returning();
+
+    revalidatePath("/notebook");
+    return deleted[0];
+}
+
+export async function getCommentsForTodo(todoId: string) {
+    const user = await getUser();
+
+    return db
+        .select()
+        .from(comment)
+        .where(and(eq(comment.userId, user.id), eq(comment.todoId, todoId)))
+        .orderBy(asc(comment.createdAt));
+}
+
+export async function getCommentsForNote(noteId: string) {
+    const user = await getUser();
+
+    return db
+        .select()
+        .from(comment)
+        .where(and(eq(comment.userId, user.id), eq(comment.noteId, noteId)))
+        .orderBy(asc(comment.createdAt));
+}
+
+export async function getCommentsForDate(date: string) {
+    const user = await getUser();
+
+    // Get all todos and notes for this date
+    const [dateTodos, dateNotes] = await Promise.all([
+        db.select({ id: todo.id }).from(todo).where(and(eq(todo.userId, user.id), eq(todo.date, date))),
+        db.select({ id: note.id }).from(note).where(and(eq(note.userId, user.id), eq(note.date, date)))
+    ]);
+
+    const todoIds = dateTodos.map((t) => t.id);
+    const noteIds = dateNotes.map((n) => n.id);
+
+    if (todoIds.length === 0 && noteIds.length === 0) {
+        return { todoComments: {}, noteComments: {} };
+    }
+
+    // Fetch all comments for these todos and notes
+    const allComments = await db
+        .select()
+        .from(comment)
+        .where(eq(comment.userId, user.id))
+        .orderBy(asc(comment.createdAt));
+
+    // Organize by todoId and noteId
+    const todoComments: Record<string, typeof allComments> = {};
+    const noteComments: Record<string, typeof allComments> = {};
+
+    for (const c of allComments) {
+        if (c.todoId && todoIds.includes(c.todoId)) {
+            if (!todoComments[c.todoId]) todoComments[c.todoId] = [];
+            todoComments[c.todoId].push(c);
+        }
+        if (c.noteId && noteIds.includes(c.noteId)) {
+            if (!noteComments[c.noteId]) noteComments[c.noteId] = [];
+            noteComments[c.noteId].push(c);
+        }
+    }
+
+    return { todoComments, noteComments };
 }
