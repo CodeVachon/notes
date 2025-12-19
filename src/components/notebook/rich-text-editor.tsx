@@ -6,7 +6,84 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { Extension, textblockTypeInputRule, markInputRule } from "@tiptap/core";
 import { common, createLowlight } from "lowlight";
+
+// Custom extension to add markdown shortcuts for code blocks
+const MarkdownCodeShortcuts = Extension.create({
+    name: "markdownCodeShortcuts",
+
+    addInputRules() {
+        // Get the codeBlock node type from the schema
+        const codeBlockType = this.editor.schema.nodes.codeBlock;
+        const codeMarkType = this.editor.schema.marks.code;
+
+        const rules = [];
+
+        // Triple backticks with optional language: ```js, ```sql, ```
+        if (codeBlockType) {
+            rules.push(
+                textblockTypeInputRule({
+                    find: /^```([a-zA-Z0-9_-]*)[\s\n]$/,
+                    type: codeBlockType,
+                    getAttributes: (match) => ({
+                        language: match[1] || "sql"
+                    })
+                })
+            );
+        }
+
+        // Inline code with single backticks: `text`
+        if (codeMarkType) {
+            rules.push(
+                markInputRule({
+                    find: /(?:^|[^`])(`([^`]+)`)$/,
+                    type: codeMarkType
+                })
+            );
+        }
+
+        return rules;
+    },
+
+    addKeyboardShortcuts() {
+        return {
+            // Exit code block with triple backticks by pressing Enter on a line with just ```
+            Enter: ({ editor }) => {
+                if (!editor.isActive("codeBlock")) {
+                    return false;
+                }
+
+                const { state } = editor;
+                const { selection } = state;
+                const { $from } = selection;
+
+                // Get the current line text
+                const lineStart = $from.start();
+                const lineText = state.doc.textBetween(lineStart, $from.pos, "\n");
+
+                // Check if the current line is just ``` (to exit code block)
+                if (lineText.trim() === "```") {
+                    // Delete the ``` and exit the code block
+                    editor
+                        .chain()
+                        .focus()
+                        .command(({ tr }) => {
+                            // Delete from start of the ``` to current position
+                            const deleteFrom = $from.pos - lineText.length;
+                            tr.delete(deleteFrom, $from.pos);
+                            return true;
+                        })
+                        .exitCode()
+                        .run();
+                    return true;
+                }
+
+                return false;
+            }
+        };
+    }
+});
 import {
     IconBold,
     IconItalic,
@@ -54,6 +131,7 @@ export function RichTextEditor({
                 lowlight,
                 defaultLanguage: "sql"
             }),
+            MarkdownCodeShortcuts,
             Underline,
             Link.configure({
                 openOnClick: false,

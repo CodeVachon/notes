@@ -9,7 +9,12 @@ import { auth } from "@/lib/auth";
 
 // Helper to get authenticated user
 async function getUser() {
-    const session = await auth.api.getSession({ headers: await headers() });
+    let session;
+    try {
+        session = await auth.api.getSession({ headers: await headers() });
+    } catch {
+        throw new Error("Unauthorized");
+    }
     if (!session) throw new Error("Unauthorized");
     return session.user;
 }
