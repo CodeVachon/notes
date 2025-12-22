@@ -2,11 +2,20 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, and, sql, desc, ilike } from "drizzle-orm";
+import { eq, and, sql, desc, ilike, asc, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { tag, tagMention, note, todo, comment } from "@/db/schema";
+import {
+    tag,
+    tagMention,
+    note,
+    todo,
+    comment,
+    type Note,
+    type Todo,
+    type Comment
+} from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { extractTags, truncateContent } from "@/lib/tag-utils";
+import { extractTags } from "@/lib/tag-utils";
 
 // Helper to get authenticated user
 async function getUser() {
@@ -129,17 +138,17 @@ export async function getTagSuggestions(query: string) {
 
 // ============ Tag Mentions Queries ============
 
-export type TagMentionResult = {
-    id: string;
-    type: "note" | "todo" | "comment";
-    date: string;
-    title: string | null;
-    contentSnippet: string;
-    createdAt: Date;
-};
+export type TagMentionsData = {
+    notes: Note[];
+    todos: Todo[];
+    noteComments: Record<string, Comment[]>;
+    todoComments: Record<string, Comment[]>;
+    dates: string[]; // Unique dates sorted newest first
+} | null;
 
 // Get all mentions for a tag (for /tags/[tagname] page)
-export async function getTagMentions(tagName: string): Promise<TagMentionResult[] | null> {
+// Returns full note/todo objects with their comments, grouped by date
+export async function getTagMentions(tagName: string): Promise<TagMentionsData> {
     const user = await getUser();
 
     // Find the tag
@@ -151,87 +160,71 @@ export async function getTagMentions(tagName: string): Promise<TagMentionResult[
 
     if (!tagRecord[0]) return null;
 
-    // Get all mentions with joined data
+    // Get all mentions
     const mentions = await db
-        .select({
-            mentionId: tagMention.id,
-            mentionCreatedAt: tagMention.createdAt,
-            noteId: tagMention.noteId,
-            todoId: tagMention.todoId,
-            commentId: tagMention.commentId,
-            // Note fields
-            noteTitle: note.title,
-            noteContent: note.content,
-            noteDate: note.date,
-            // Todo fields
-            todoTitle: todo.title,
-            todoDescription: todo.description,
-            todoDate: todo.date,
-            // Comment fields
-            commentContent: comment.content,
-            commentNoteId: comment.noteId,
-            commentTodoId: comment.todoId
-        })
+        .select()
         .from(tagMention)
-        .leftJoin(note, eq(tagMention.noteId, note.id))
-        .leftJoin(todo, eq(tagMention.todoId, todo.id))
-        .leftJoin(comment, eq(tagMention.commentId, comment.id))
-        .where(eq(tagMention.tagId, tagRecord[0].id))
-        .orderBy(desc(tagMention.createdAt));
+        .where(eq(tagMention.tagId, tagRecord[0].id));
 
-    // For comments, we need to get the parent date
-    const results: TagMentionResult[] = [];
+    // Collect IDs
+    const noteIds = mentions.filter((m) => m.noteId).map((m) => m.noteId!);
+    const todoIds = mentions.filter((m) => m.todoId).map((m) => m.todoId!);
 
-    for (const m of mentions) {
-        if (m.noteId && m.noteDate) {
-            results.push({
-                id: m.mentionId,
-                type: "note",
-                date: m.noteDate,
-                title: m.noteTitle,
-                contentSnippet: truncateContent(m.noteContent ?? ""),
-                createdAt: m.mentionCreatedAt
-            });
-        } else if (m.todoId && m.todoDate) {
-            results.push({
-                id: m.mentionId,
-                type: "todo",
-                date: m.todoDate,
-                title: m.todoTitle,
-                contentSnippet: truncateContent(m.todoDescription ?? ""),
-                createdAt: m.mentionCreatedAt
-            });
-        } else if (m.commentId) {
-            // Get parent date from note or todo
-            let parentDate = "";
-            if (m.commentNoteId) {
-                const parentNote = await db
-                    .select({ date: note.date })
-                    .from(note)
-                    .where(eq(note.id, m.commentNoteId))
-                    .limit(1);
-                if (parentNote[0]) parentDate = parentNote[0].date;
-            } else if (m.commentTodoId) {
-                const parentTodo = await db
-                    .select({ date: todo.date })
-                    .from(todo)
-                    .where(eq(todo.id, m.commentTodoId))
-                    .limit(1);
-                if (parentTodo[0]) parentDate = parentTodo[0].date;
-            }
+    // Fetch full notes and todos
+    const notes =
+        noteIds.length > 0
+            ? await db
+                  .select()
+                  .from(note)
+                  .where(and(eq(note.userId, user.id), inArray(note.id, noteIds)))
+                  .orderBy(desc(note.date), desc(note.createdAt))
+            : [];
 
-            results.push({
-                id: m.mentionId,
-                type: "comment",
-                date: parentDate,
-                title: null,
-                contentSnippet: truncateContent(m.commentContent ?? ""),
-                createdAt: m.mentionCreatedAt
-            });
+    const todos =
+        todoIds.length > 0
+            ? await db
+                  .select()
+                  .from(todo)
+                  .where(and(eq(todo.userId, user.id), inArray(todo.id, todoIds)))
+                  .orderBy(desc(todo.date), desc(todo.createdAt))
+            : [];
+
+    // Fetch comments for these notes and todos
+    const allNoteIds = notes.map((n) => n.id);
+    const allTodoIds = todos.map((t) => t.id);
+
+    const allComments = await db
+        .select()
+        .from(comment)
+        .where(eq(comment.userId, user.id))
+        .orderBy(asc(comment.createdAt));
+
+    // Organize comments by noteId and todoId
+    const noteComments: Record<string, Comment[]> = {};
+    const todoComments: Record<string, Comment[]> = {};
+
+    for (const c of allComments) {
+        if (c.noteId && allNoteIds.includes(c.noteId)) {
+            if (!noteComments[c.noteId]) noteComments[c.noteId] = [];
+            noteComments[c.noteId].push(c);
+        }
+        if (c.todoId && allTodoIds.includes(c.todoId)) {
+            if (!todoComments[c.todoId]) todoComments[c.todoId] = [];
+            todoComments[c.todoId].push(c);
         }
     }
 
-    return results;
+    // Get unique dates sorted newest first
+    const allDates = new Set([...notes.map((n) => n.date), ...todos.map((t) => t.date)]);
+    const dates = Array.from(allDates).sort((a, b) => b.localeCompare(a));
+
+    return {
+        notes,
+        todos,
+        noteComments,
+        todoComments,
+        dates
+    };
 }
 
 // Check if a tag exists (for validation)

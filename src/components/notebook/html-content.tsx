@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { common, createLowlight } from "lowlight";
 import { toHtml } from "hast-util-to-html";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
@@ -13,56 +12,12 @@ const lowlight = createLowlight(common);
 // Tag detection regex
 const TAG_REGEX = /\[\[([a-zA-Z0-9]+)\]\]/g;
 
-// Tag link component
-function TagLink({ tagName }: { tagName: string }) {
-    return (
-        <Link
-            href={`/tags/${tagName.toLowerCase()}`}
-            className="text-primary font-medium hover:underline"
-            onClick={(e) => e.stopPropagation()}
-        >
-            [[{tagName}]]
-        </Link>
-    );
-}
-
-// Parse HTML content and replace tags with TagLink components
-function parseHtmlWithTags(html: string): React.ReactNode[] {
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let match;
-    let keyCounter = 0;
-
-    // Reset regex state
-    TAG_REGEX.lastIndex = 0;
-
-    while ((match = TAG_REGEX.exec(html)) !== null) {
-        // Add HTML before this tag
-        if (match.index > lastIndex) {
-            parts.push(
-                <span
-                    key={`html-${keyCounter++}`}
-                    dangerouslySetInnerHTML={{ __html: html.slice(lastIndex, match.index) }}
-                />
-            );
-        }
-
-        // Add tag link
-        parts.push(<TagLink key={`tag-${keyCounter++}`} tagName={match[1]} />);
-        lastIndex = match.index + match[0].length;
-    }
-
-    // Add remaining HTML
-    if (lastIndex < html.length) {
-        parts.push(
-            <span
-                key={`html-${keyCounter++}`}
-                dangerouslySetInnerHTML={{ __html: html.slice(lastIndex) }}
-            />
-        );
-    }
-
-    return parts;
+// Convert tags to anchor elements in HTML string (avoids hydration issues with React Link)
+function renderTagsAsHtml(html: string): string {
+    return html.replace(TAG_REGEX, (_, tagName: string) => {
+        const href = `/tags/${tagName.toLowerCase()}`;
+        return `<a href="${href}" class="text-primary font-medium hover:underline" data-tag="${tagName}">[[${tagName}]]</a>`;
+    });
 }
 
 interface CodeBlockProps {
@@ -166,7 +121,10 @@ export function HtmlContent({ content, className }: HtmlContentProps) {
         <div className={cn("prose prose-sm dark:prose-invert max-w-none", className)}>
             {parts.map((part, index) =>
                 part.type === "html" ? (
-                    <span key={index}>{parseHtmlWithTags(part.content)}</span>
+                    <span
+                        key={index}
+                        dangerouslySetInnerHTML={{ __html: renderTagsAsHtml(part.content) }}
+                    />
                 ) : (
                     <CodeBlock key={index} code={part.code} language={part.language} />
                 )
