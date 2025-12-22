@@ -4,6 +4,7 @@ import { DailyHeader } from "@/components/notebook/daily-header";
 import { TodoList } from "@/components/notebook/todo-list";
 import { NoteList } from "@/components/notebook/note-list";
 import { getNotesForDate, getTodosForDate, getCommentsForDate } from "@/app/notebook/actions";
+import { getAllProjects, getProjectsForItems } from "@/app/projects/actions";
 import { isValidDateString, getTodayString } from "@/lib/date-utils";
 
 interface DailyPageProps {
@@ -19,10 +20,23 @@ export default async function DailyPage({ params }: DailyPageProps) {
     }
 
     // Fetch data in parallel
-    const [todos, notes, { todoComments, noteComments }] = await Promise.all([
+    const [todos, notes, { todoComments, noteComments }, projects] = await Promise.all([
         getTodosForDate(date),
         getNotesForDate(date),
-        getCommentsForDate(date)
+        getCommentsForDate(date),
+        getAllProjects()
+    ]);
+
+    // Fetch project assignments for todos and notes
+    const [todoProjects, noteProjects] = await Promise.all([
+        getProjectsForItems(
+            "todo",
+            todos.map((t) => t.id)
+        ),
+        getProjectsForItems(
+            "note",
+            notes.map((n) => n.id)
+        )
     ]);
 
     return (
@@ -33,11 +47,23 @@ export default async function DailyPage({ params }: DailyPageProps) {
 
             <div className="flex-1 overflow-y-auto p-6">
                 <div className="mx-auto max-w-3xl space-y-8">
-                    <TodoList todos={todos} date={date} todoComments={todoComments} />
+                    <TodoList
+                        todos={todos}
+                        date={date}
+                        todoComments={todoComments}
+                        todoProjects={todoProjects}
+                        projects={projects}
+                    />
 
                     <Separator />
 
-                    <NoteList notes={notes} date={date} noteComments={noteComments} />
+                    <NoteList
+                        notes={notes}
+                        date={date}
+                        noteComments={noteComments}
+                        noteProjects={noteProjects}
+                        projects={projects}
+                    />
                 </div>
             </div>
         </div>

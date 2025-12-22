@@ -15,12 +15,15 @@ import {
     AlertDialogCancel
 } from "@/components/ui/alert-dialog";
 import { RichTextEditor } from "./rich-text-editor";
+import { ProjectSelector } from "./project-selector";
 import { createNote, updateNote } from "@/app/notebook/actions";
-import type { Note } from "@/db/schema";
+import type { Note, Project } from "@/db/schema";
 
 interface NoteEditorDialogProps {
     date: string;
     note?: Note;
+    projects?: Project[];
+    initialProjectIds?: string[];
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     trigger?: React.ReactElement;
@@ -30,15 +33,20 @@ interface NoteEditorDialogProps {
 function NoteEditorForm({
     date,
     note,
+    projects = [],
+    initialProjectIds = [],
     onOpenChange
 }: {
     date: string;
     note?: Note;
+    projects?: Project[];
+    initialProjectIds?: string[];
     onOpenChange?: (open: boolean) => void;
 }) {
     const [isPending, startTransition] = useTransition();
     const [title, setTitle] = useState(note?.title ?? "");
     const [content, setContent] = useState(note?.content ?? "");
+    const [projectIds, setProjectIds] = useState<string[]>(initialProjectIds);
 
     const isEditing = !!note;
 
@@ -50,13 +58,15 @@ function NoteEditorForm({
             if (isEditing) {
                 await updateNote(note.id, {
                     title: title.trim(),
-                    content
+                    content,
+                    projectIds
                 });
             } else {
                 await createNote({
                     date,
                     title: title.trim(),
-                    content
+                    content,
+                    projectIds
                 });
             }
             onOpenChange?.(false);
@@ -85,6 +95,18 @@ function NoteEditorForm({
                 />
             </div>
 
+            {projects.length > 0 && (
+                <div className="grid gap-2">
+                    <Label>Projects (optional)</Label>
+                    <ProjectSelector
+                        projects={projects}
+                        selectedProjectIds={projectIds}
+                        onProjectsChange={setProjectIds}
+                        disabled={isPending}
+                    />
+                </div>
+            )}
+
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <Button type="submit" disabled={isPending || !title.trim()}>
@@ -98,6 +120,8 @@ function NoteEditorForm({
 export function NoteEditorDialog({
     date,
     note,
+    projects = [],
+    initialProjectIds = [],
     open,
     onOpenChange,
     trigger
@@ -128,6 +152,8 @@ export function NoteEditorDialog({
                     key={note?.id ?? "new"}
                     date={date}
                     note={note}
+                    projects={projects}
+                    initialProjectIds={initialProjectIds}
                     onOpenChange={onOpenChange}
                 />
             </AlertDialogContent>

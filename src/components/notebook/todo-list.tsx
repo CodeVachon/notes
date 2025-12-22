@@ -3,15 +3,23 @@
 import { useState } from "react";
 import { TodoItem } from "./todo-item";
 import { TodoForm } from "./todo-form";
-import type { Todo, Comment } from "@/db/schema";
+import type { Todo, Comment, Project } from "@/db/schema";
 
 interface TodoListProps {
     todos: Todo[];
     date: string;
     todoComments: Record<string, Comment[]>;
+    todoProjects?: Record<string, Project[]>;
+    projects?: Project[];
 }
 
-export function TodoList({ todos, date, todoComments }: TodoListProps) {
+export function TodoList({
+    todos,
+    date,
+    todoComments,
+    todoProjects = {},
+    projects = []
+}: TodoListProps) {
     const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -24,7 +32,12 @@ export function TodoList({ todos, date, todoComments }: TodoListProps) {
                 <h2 className="text-muted-foreground text-sm font-medium">
                     Todos ({todos.length})
                 </h2>
-                <TodoForm date={date} open={isFormOpen} onOpenChange={setIsFormOpen} />
+                <TodoForm
+                    date={date}
+                    projects={projects}
+                    open={isFormOpen}
+                    onOpenChange={setIsFormOpen}
+                />
             </div>
 
             {todos.length === 0 ? (
@@ -40,6 +53,7 @@ export function TodoList({ todos, date, todoComments }: TodoListProps) {
                             key={todo.id}
                             todo={todo}
                             comments={todoComments[todo.id] ?? []}
+                            projects={todoProjects[todo.id] ?? []}
                             onEdit={(t) => setEditingTodo(t)}
                         />
                     ))}
@@ -57,6 +71,7 @@ export function TodoList({ todos, date, todoComments }: TodoListProps) {
                             key={todo.id}
                             todo={todo}
                             comments={todoComments[todo.id] ?? []}
+                            projects={todoProjects[todo.id] ?? []}
                             onEdit={(t) => setEditingTodo(t)}
                         />
                     ))}
@@ -68,6 +83,8 @@ export function TodoList({ todos, date, todoComments }: TodoListProps) {
                 <TodoForm
                     date={date}
                     todo={editingTodo}
+                    projects={projects}
+                    initialProjectIds={(todoProjects[editingTodo.id] ?? []).map((p) => p.id)}
                     open={!!editingTodo}
                     onOpenChange={(open) => {
                         if (!open) setEditingTodo(null);

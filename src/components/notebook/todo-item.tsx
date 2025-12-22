@@ -11,20 +11,22 @@ import {
     DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
 import { PriorityBadge } from "./priority-badge";
+import { ProjectBadge } from "./project-badge";
 import { HtmlContent } from "./html-content";
 import { CommentSection } from "./comment-section";
 import { toggleTodo, deleteTodo } from "@/app/notebook/actions";
 import { formatTimeForDisplay } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
-import type { Todo, Comment } from "@/db/schema";
+import type { Todo, Comment, Project } from "@/db/schema";
 
 interface TodoItemProps {
     todo: Todo;
     comments: Comment[];
+    projects?: Pick<Project, "id" | "name" | "color" | "emoji">[];
     onEdit: (todo: Todo) => void;
 }
 
-export function TodoItem({ todo, comments, onEdit }: TodoItemProps) {
+export function TodoItem({ todo, comments, projects = [], onEdit }: TodoItemProps) {
     const [isPending, startTransition] = useTransition();
     const [optimisticTodo, setOptimisticTodo] = useOptimistic(todo);
 
@@ -77,6 +79,13 @@ export function TodoItem({ todo, comments, onEdit }: TodoItemProps) {
                             />
                         )}
                         <CommentSection comments={comments} todoId={todo.id} />
+                        {projects.length > 0 && (
+                            <div className="mt-1.5 flex flex-wrap gap-1">
+                                {projects.map((project) => (
+                                    <ProjectBadge key={project.id} project={project} asLink />
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">

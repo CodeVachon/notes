@@ -20,16 +20,18 @@ import {
 import { deleteNote } from "@/app/notebook/actions";
 import { HtmlContent } from "./html-content";
 import { CommentSection } from "./comment-section";
+import { ProjectBadge } from "./project-badge";
 import { cn } from "@/lib/utils";
-import type { Note, Comment } from "@/db/schema";
+import type { Note, Comment, Project } from "@/db/schema";
 
 interface NoteCardProps {
     note: Note;
     comments: Comment[];
+    projects?: Pick<Project, "id" | "name" | "color" | "emoji">[];
     onEdit: (note: Note) => void;
 }
 
-export function NoteCard({ note, comments, onEdit }: NoteCardProps) {
+export function NoteCard({ note, comments, projects = [], onEdit }: NoteCardProps) {
     const [isPending, startTransition] = useTransition();
 
     const handleDelete = () => {
@@ -95,6 +97,13 @@ export function NoteCard({ note, comments, onEdit }: NoteCardProps) {
             </CardHeader>
             <CardContent>
                 {note.content && <HtmlContent content={note.content} className="text-sm" />}
+                {projects.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1" onClick={(e) => e.stopPropagation()}>
+                        {projects.map((project) => (
+                            <ProjectBadge key={project.id} project={project} asLink />
+                        ))}
+                    </div>
+                )}
                 <div onClick={(e) => e.stopPropagation()}>
                     <CommentSection comments={comments} noteId={note.id} />
                 </div>

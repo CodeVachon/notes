@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { note, todo, comment, type TodoPriority } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { syncContentTags } from "@/app/tags/actions";
+import { syncItemProjects } from "@/app/projects/actions";
 
 // Helper to get authenticated user
 async function getUser() {
@@ -22,7 +23,12 @@ async function getUser() {
 
 // ============ Notes Actions ============
 
-export async function createNote(data: { date: string; title: string; content: string }) {
+export async function createNote(data: {
+    date: string;
+    title: string;
+    content: string;
+    projectIds?: string[];
+}) {
     const user = await getUser();
     const id = crypto.randomUUID();
 
@@ -40,18 +46,27 @@ export async function createNote(data: { date: string; title: string; content: s
     // Sync tags from content
     await syncContentTags(user.id, data.content, "note", result[0].id);
 
+    // Sync project assignments
+    if (data.projectIds && data.projectIds.length > 0) {
+        await syncItemProjects(data.projectIds, "note", result[0].id);
+    }
+
     revalidatePath(`/notebook/${data.date}`);
     revalidatePath("/notebook");
     return result[0];
 }
 
-export async function updateNote(noteId: string, data: { title?: string; content?: string }) {
+export async function updateNote(
+    noteId: string,
+    data: { title?: string; content?: string; projectIds?: string[] }
+) {
     const user = await getUser();
 
     const result = await db
         .update(note)
         .set({
-            ...data,
+            title: data.title,
+            content: data.content,
             updatedAt: new Date()
         })
         .where(and(eq(note.id, noteId), eq(note.userId, user.id)))
@@ -61,6 +76,10 @@ export async function updateNote(noteId: string, data: { title?: string; content
         // Sync tags from content if content was updated
         if (data.content !== undefined) {
             await syncContentTags(user.id, data.content, "note", noteId);
+        }
+        // Sync project assignments if provided
+        if (data.projectIds !== undefined) {
+            await syncItemProjects(data.projectIds, "note", noteId);
         }
         revalidatePath(`/notebook/${result[0].date}`);
         revalidatePath("/notebook");
@@ -101,6 +120,7 @@ export async function createTodo(data: {
     description?: string;
     priority?: TodoPriority;
     dueTime?: string | null;
+    projectIds?: string[];
 }) {
     const user = await getUser();
     const id = crypto.randomUUID();
@@ -123,6 +143,11 @@ export async function createTodo(data: {
         await syncContentTags(user.id, data.description, "todo", result[0].id);
     }
 
+    // Sync project assignments
+    if (data.projectIds && data.projectIds.length > 0) {
+        await syncItemProjects(data.projectIds, "todo", result[0].id);
+    }
+
     revalidatePath(`/notebook/${data.date}`);
     revalidatePath("/notebook");
     return result[0];
@@ -136,12 +161,16 @@ export async function updateTodo(
         priority: TodoPriority;
         dueTime: string | null;
         completed: boolean;
+        projectIds: string[];
     }>
 ) {
     const user = await getUser();
 
+    // Extract projectIds before spreading to updateData (it's not a db column)
+    const { projectIds, ...dbData } = data;
+
     const updateData: Record<string, unknown> = {
-        ...data,
+        ...dbData,
         updatedAt: new Date()
     };
 
@@ -160,6 +189,10 @@ export async function updateTodo(
         // Sync tags from description if description was updated
         if (data.description !== undefined) {
             await syncContentTags(user.id, data.description ?? "", "todo", todoId);
+        }
+        // Sync project assignments if provided
+        if (projectIds !== undefined) {
+            await syncItemProjects(projectIds, "todo", todoId);
         }
         revalidatePath(`/notebook/${result[0].date}`);
         revalidatePath("/notebook");

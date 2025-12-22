@@ -3,15 +3,23 @@
 import { useState } from "react";
 import { NoteCard } from "./note-card";
 import { NoteEditorDialog } from "./note-editor-dialog";
-import type { Note, Comment } from "@/db/schema";
+import type { Note, Comment, Project } from "@/db/schema";
 
 interface NoteListProps {
     notes: Note[];
     date: string;
     noteComments: Record<string, Comment[]>;
+    noteProjects?: Record<string, Project[]>;
+    projects?: Project[];
 }
 
-export function NoteList({ notes, date, noteComments }: NoteListProps) {
+export function NoteList({
+    notes,
+    date,
+    noteComments,
+    noteProjects = {},
+    projects = []
+}: NoteListProps) {
     const [editingNote, setEditingNote] = useState<Note | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -21,7 +29,12 @@ export function NoteList({ notes, date, noteComments }: NoteListProps) {
                 <h2 className="text-muted-foreground text-sm font-medium">
                     Notes ({notes.length})
                 </h2>
-                <NoteEditorDialog date={date} open={isFormOpen} onOpenChange={setIsFormOpen} />
+                <NoteEditorDialog
+                    date={date}
+                    projects={projects}
+                    open={isFormOpen}
+                    onOpenChange={setIsFormOpen}
+                />
             </div>
 
             {notes.length === 0 ? (
@@ -37,6 +50,7 @@ export function NoteList({ notes, date, noteComments }: NoteListProps) {
                             key={note.id}
                             note={note}
                             comments={noteComments[note.id] ?? []}
+                            projects={noteProjects[note.id] ?? []}
                             onEdit={(n) => setEditingNote(n)}
                         />
                     ))}
@@ -48,6 +62,8 @@ export function NoteList({ notes, date, noteComments }: NoteListProps) {
                 <NoteEditorDialog
                     date={date}
                     note={editingNote}
+                    projects={projects}
+                    initialProjectIds={(noteProjects[editingNote.id] ?? []).map((p) => p.id)}
                     open={!!editingNote}
                     onOpenChange={(open) => {
                         if (!open) setEditingNote(null);

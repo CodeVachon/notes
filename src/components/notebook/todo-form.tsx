@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "./rich-text-editor";
+import { ProjectSelector } from "./project-selector";
 import {
     Select,
     SelectTrigger,
@@ -24,22 +25,33 @@ import {
     AlertDialogCancel
 } from "@/components/ui/alert-dialog";
 import { createTodo, updateTodo } from "@/app/notebook/actions";
-import type { Todo, TodoPriority } from "@/db/schema";
+import type { Todo, TodoPriority, Project } from "@/db/schema";
 
 interface TodoFormProps {
     date: string;
     todo?: Todo;
+    projects?: Project[];
+    initialProjectIds?: string[];
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     trigger?: React.ReactElement;
 }
 
-export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormProps) {
+export function TodoForm({
+    date,
+    todo,
+    projects = [],
+    initialProjectIds = [],
+    open,
+    onOpenChange,
+    trigger
+}: TodoFormProps) {
     const [isPending, startTransition] = useTransition();
     const [title, setTitle] = useState(todo?.title ?? "");
     const [description, setDescription] = useState(todo?.description ?? "");
     const [priority, setPriority] = useState<TodoPriority>(todo?.priority ?? "medium");
     const [dueTime, setDueTime] = useState(todo?.dueTime ?? "");
+    const [projectIds, setProjectIds] = useState<string[]>(initialProjectIds);
 
     const isEditing = !!todo;
 
@@ -61,7 +73,8 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
                     title: title.trim(),
                     description: cleanDescription,
                     priority,
-                    dueTime: dueTime || null
+                    dueTime: dueTime || null,
+                    projectIds
                 });
             } else {
                 await createTodo({
@@ -69,7 +82,8 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
                     title: title.trim(),
                     description: cleanDescription || undefined,
                     priority,
-                    dueTime: dueTime || null
+                    dueTime: dueTime || null,
+                    projectIds
                 });
             }
             onOpenChange?.(false);
@@ -78,6 +92,7 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
                 setDescription("");
                 setPriority("medium");
                 setDueTime("");
+                setProjectIds([]);
             }
         });
     };
@@ -156,6 +171,18 @@ export function TodoForm({ date, todo, open, onOpenChange, trigger }: TodoFormPr
                             />
                         </div>
                     </div>
+
+                    {projects.length > 0 && (
+                        <div className="grid gap-2">
+                            <Label>Projects (optional)</Label>
+                            <ProjectSelector
+                                projects={projects}
+                                selectedProjectIds={projectIds}
+                                onProjectsChange={setProjectIds}
+                                disabled={isPending}
+                            />
+                        </div>
+                    )}
 
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>

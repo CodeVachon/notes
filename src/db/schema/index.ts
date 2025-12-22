@@ -6,3 +6,4 @@ export * from "./todo";
 export * from "./note";
 export * from "./comment";
 export * from "./tag";
+export * from "./project";

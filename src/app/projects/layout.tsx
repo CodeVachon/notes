@@ -3,10 +3,9 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { NotebookClientWrapper } from "@/components/notebook/notebook-client-wrapper";
-import { getDatesWithContent } from "./actions";
-import { getSidebarProjects } from "@/app/projects/actions";
+import { getDatesWithContent } from "@/app/notebook/actions";
 
-export default async function NotebookLayout({ children }: { children: React.ReactNode }) {
+export default async function ProjectsLayout({ children }: { children: React.ReactNode }) {
     let session;
     try {
         session = await auth.api.getSession({
@@ -23,17 +22,10 @@ export default async function NotebookLayout({ children }: { children: React.Rea
         redirect("/sign-in");
     }
 
-    const [datesWithContent, sidebarProjects] = await Promise.all([
-        getDatesWithContent(),
-        getSidebarProjects()
-    ]);
+    const datesWithContent = await getDatesWithContent();
 
     return (
-        <NotebookClientWrapper
-            user={session.user}
-            datesWithContent={datesWithContent}
-            sidebarProjects={sidebarProjects}
-        >
+        <NotebookClientWrapper user={session.user} datesWithContent={datesWithContent}>
             {children}
         </NotebookClientWrapper>
     );
