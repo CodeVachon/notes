@@ -27,7 +27,7 @@ function ColorDot({ color }: { color: ProjectColor }) {
         gray: "bg-gray-500"
     };
 
-    return <span className={cn("size-2 rounded-full shrink-0", colorClasses[color])} />;
+    return <span className={cn("size-2 shrink-0 rounded-full", colorClasses[color])} />;
 }
 
 interface ProjectSelectorProps {

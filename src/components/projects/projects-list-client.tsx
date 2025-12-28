@@ -121,10 +121,7 @@ export function ProjectsListClient({ projects }: ProjectsListClientProps) {
             )}
 
             {/* Create Dialog */}
-            <ProjectFormDialog
-                open={createDialogOpen}
-                onOpenChange={setCreateDialogOpen}
-            />
+            <ProjectFormDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
         </div>
     );
 }

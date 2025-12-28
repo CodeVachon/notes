@@ -44,7 +44,7 @@ function ProjectBadge({ project, asLink = false, className }: ProjectBadgeProps)
                 href={`/projects/${project.id}`}
                 className={cn(
                     projectBadgeVariants({ color: project.color as ProjectColor }),
-                    "hover:opacity-80 transition-opacity",
+                    "transition-opacity hover:opacity-80",
                     className
                 )}
                 onClick={(e) => e.stopPropagation()}
@@ -56,7 +56,10 @@ function ProjectBadge({ project, asLink = false, className }: ProjectBadgeProps)
 
     return (
         <span
-            className={cn(projectBadgeVariants({ color: project.color as ProjectColor }), className)}
+            className={cn(
+                projectBadgeVariants({ color: project.color as ProjectColor }),
+                className
+            )}
         >
             {content}
         </span>

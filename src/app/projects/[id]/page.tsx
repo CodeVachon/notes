@@ -45,11 +45,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <div className="flex-1 overflow-y-auto p-6">
                 <div className="mx-auto max-w-3xl space-y-6">
                     {/* Project Description */}
-                    {project.description && project.description !== "" && project.description !== "<p></p>" && (
-                        <div className="rounded-lg border p-4">
-                            <HtmlContent content={project.description} />
-                        </div>
-                    )}
+                    {project.description &&
+                        project.description !== "" &&
+                        project.description !== "<p></p>" && (
+                            <div className="rounded-lg border p-4">
+                                <HtmlContent content={project.description} />
+                            </div>
+                        )}
 
                     {/* Project Items */}
                     {totalItems === 0 ? (

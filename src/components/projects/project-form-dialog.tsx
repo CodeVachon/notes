@@ -54,7 +54,7 @@ function ColorPicker({
                         "size-6 rounded-full transition-all",
                         colorClasses[color],
                         value === color
-                            ? "ring-2 ring-offset-2 ring-offset-background ring-foreground"
+                            ? "ring-offset-background ring-foreground ring-2 ring-offset-2"
                             : "hover:scale-110"
                     )}
                     title={color.charAt(0).toUpperCase() + color.slice(1)}
