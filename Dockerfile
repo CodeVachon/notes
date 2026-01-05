@@ -14,6 +14,17 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN bun run build
 
+# Migration image - includes drizzle-kit for database migrations
+FROM oven/bun:1-alpine AS migrator
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json ./
+COPY drizzle.config.ts ./
+COPY src/db ./src/db
+
+CMD ["bun", "run", "db:migrate"]
+
 # Production image using Node.js Alpine (Next.js standalone requires Node)
 FROM node:22-alpine AS runner
 WORKDIR /app
