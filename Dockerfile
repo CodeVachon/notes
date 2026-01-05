@@ -14,23 +14,17 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN bun run build
 
-# Migration image - includes drizzle-kit for database migrations
-FROM oven/bun:1-alpine AS migrator
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json ./
-COPY drizzle.config.ts ./
-COPY src/db ./src/db
-
-CMD ["bun", "run", "db:migrate"]
-
 # Production image using Node.js Alpine (Next.js standalone requires Node)
 FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install bun for running migrations
+RUN apk add --no-cache bash curl unzip && \
+    curl -fsSL https://bun.sh/install | bash && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
@@ -40,6 +34,12 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy migration files and dependencies
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/drizzle.config.ts ./
+COPY --from=builder /app/src/db ./src/db
 
 USER nextjs
 
