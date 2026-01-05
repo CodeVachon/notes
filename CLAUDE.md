@@ -15,6 +15,19 @@ bun run format    # Format all files with Prettier
 bun run format:check  # Check formatting compliance
 ```
 
+### Database Commands
+
+```bash
+bun run docker:up     # Start PostgreSQL container
+bun run docker:down   # Stop PostgreSQL container
+bun run docker:logs   # View PostgreSQL logs
+
+bun run db:generate   # Generate migrations from schema changes
+bun run db:migrate    # Apply migrations to database
+bun run db:push       # Push schema directly (dev only)
+bun run db:studio     # Open Drizzle Studio GUI
+```
+
 ## Architecture
 
 This is a Next.js 16 App Router project using:
@@ -24,12 +37,18 @@ This is a Next.js 16 App Router project using:
 - **Styling**: Tailwind CSS v4 with OKLch color theming
 - **UI Components**: Base UI primitives with shadcn-style patterns
 - **Icons**: Tabler Icons React
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Better Auth with GitHub OAuth
 
 ### Directory Structure
 
 - `src/app/` - Next.js App Router pages and layouts
 - `src/components/ui/` - Reusable UI components (button, card, input, etc.)
 - `src/components/` - Application-specific components
+- `src/db/schema/` - Drizzle ORM schema definitions
+- `src/db/migrations/` - Generated SQL migrations
+- `src/lib/auth.ts` - Better Auth configuration
+- `src/lib/auth-client.ts` - Client-side auth utilities
 - `src/lib/utils.ts` - Utility functions including `cn()` for class merging
 - `src/styles/globals.css` - Global styles and CSS theme variables
 
@@ -40,7 +59,26 @@ Use `@/` for absolute imports from `src/`:
 ```typescript
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { db } from "@/db";
 ```
+
+### Database Layer
+
+Drizzle ORM with PostgreSQL. Schema defined in `src/db/schema/` with tables for users, sessions, todos, notes, comments, tags, and projects. Database connection in `src/db/index.ts`.
+
+Schema changes workflow:
+1. Edit schema files in `src/db/schema/`
+2. Run `bun run db:generate` to create migration
+3. Run `bun run db:push` (dev) or `bun run db:migrate` (prod)
+
+### Server Actions
+
+Server actions are co-located with their routes in `actions.ts` files:
+- `src/app/notebook/actions.ts` - Todo, note, and comment CRUD
+- `src/app/projects/actions.ts` - Project management
+- `src/app/tags/actions.ts` - Tag extraction and syncing
+
+Actions use a `getUser()` helper that validates the session via Better Auth.
 
 ### Component Patterns
 
