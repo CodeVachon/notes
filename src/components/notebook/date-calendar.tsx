@@ -36,7 +36,7 @@ export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalend
     const isOnTodayPage = selectedDate === getTodayString();
 
     return (
-        <div className="flex flex-col items-center space-y-2">
+        <div className="flex flex-col space-y-2">
             <Calendar
                 mode="single"
                 selected={selected}
@@ -49,6 +49,16 @@ export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalend
                         "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:size-1 after:rounded-full after:bg-primary"
                 }}
                 className="p-0"
+                classNames={{
+                    root: "w-full",
+                    months: "flex flex-col w-full",
+                    month: "flex flex-col w-full gap-4",
+                    weekdays: "flex w-full",
+                    weekday:
+                        "text-muted-foreground rounded-(--cell-radius) flex-1 font-normal text-[0.8rem] select-none text-center",
+                    week: "flex w-full mt-2",
+                    day: "relative flex-1 rounded-(--cell-radius) h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius) group/day aspect-square select-none [&:first-child[data-selected=true]_button]:rounded-l-(--cell-radius)"
+                }}
             />
             <Button
                 variant="outline"
