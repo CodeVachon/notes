@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2026-01-07
+
+### Bug Fixes
+
+- Fixed "useSettings must be used within a SettingsProvider" error on Tag detail pages
+- Fixed "useSettings must be used within a SettingsProvider" error on Project pages
+- Added missing `SettingsProvider` wrapper to tags and projects layouts
+
 ## [0.2.0] - 2026-01-07
 
 ### New Features
