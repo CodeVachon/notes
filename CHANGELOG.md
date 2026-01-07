@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-01-07
+
+### New Features
+
+**Settings Panel**
+- Added settings panel for customizing time format (12h/24h)
+- Primary color selection for personalized theming
+
+### Improvements
+
+**Calendar**
+- Calendar now displays full width for better visibility
+- Fixed month selector functionality
+
+**Tag Display**
+- Updated tag display styling
+- Added document titles for improved navigation
+
 ## [0.1.0] - 2026-01-07
 
 ### New Features
