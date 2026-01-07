@@ -21,6 +21,7 @@ import { deleteNote } from "@/app/notebook/actions";
 import { HtmlContent } from "./html-content";
 import { CommentSection } from "./comment-section";
 import { ProjectBadge } from "./project-badge";
+import { TitleWithTags } from "./title-with-tags";
 import { cn } from "@/lib/utils";
 import type { Note, Comment, Project } from "@/db/schema";
 
@@ -55,7 +56,9 @@ export function NoteCard({ note, comments, projects = [], onEdit }: NoteCardProp
             onClick={() => onEdit(note)}
         >
             <CardHeader>
-                <CardTitle className="line-clamp-1">{note.title}</CardTitle>
+                <CardTitle className="line-clamp-1">
+                    <TitleWithTags title={note.title} />
+                </CardTitle>
                 <CardAction>
                     <DropdownMenu>
                         <DropdownMenuTrigger

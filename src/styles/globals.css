@@ -230,3 +230,46 @@ pre code {
 .dark .hljs-tag {
     color: oklch(0.7 0.02 286);
 }
+
+/* Blockquote styling */
+blockquote {
+    @apply border-primary/30 text-muted-foreground my-2 border-l-4 pl-4 italic;
+}
+
+.dark blockquote {
+    @apply border-primary/40;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+    opacity: 0.8;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: black;
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.dark * {
+    scrollbar-color: var(--primary) black;
+}

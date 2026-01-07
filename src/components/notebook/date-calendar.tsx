@@ -4,16 +4,18 @@ import { useRouter } from "next/navigation";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { formatDateForStorage, parseDateString, getTodayString } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 
 interface DateCalendarProps {
-    selectedDate: string;
+    selectedDate?: string; // Optional - undefined when not on a notebook date page
     datesWithContent?: string[];
 }
 
 export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalendarProps) {
     const router = useRouter();
 
-    const selected = parseDateString(selectedDate) ?? new Date();
+    // Only set selected date if we have a valid selectedDate prop
+    const selected = selectedDate ? parseDateString(selectedDate) ?? undefined : undefined;
 
     // Convert date strings to Date objects for modifiers
     const contentDates = datesWithContent
@@ -30,7 +32,8 @@ export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalend
         router.push(`/notebook/${getTodayString()}`);
     };
 
-    const isToday = selectedDate === getTodayString();
+    // Only hide button when actually on today's notebook page
+    const isOnTodayPage = selectedDate === getTodayString();
 
     return (
         <div className="flex flex-col items-center space-y-2">
@@ -47,11 +50,14 @@ export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalend
                 }}
                 className="p-0"
             />
-            {!isToday && (
-                <Button variant="outline" size="sm" className="w-full" onClick={handleTodayClick}>
-                    Go to Today
-                </Button>
-            )}
+            <Button
+                variant="outline"
+                size="sm"
+                className={cn("w-full", isOnTodayPage && "invisible")}
+                onClick={handleTodayClick}
+            >
+                Go to Today
+            </Button>
         </div>
     );
 }

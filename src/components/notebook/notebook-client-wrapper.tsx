@@ -114,7 +114,9 @@ export function NotebookClientWrapper({
                     <div className="space-y-1 p-2">
                         <CommandPaletteTrigger />
                         <Separator />
-                        <UserMenu user={user} />
+                        <div className="min-h-12">
+                            <UserMenu user={user} />
+                        </div>
                     </div>
                 </aside>
                 <main className="flex-1 overflow-hidden">{children}</main>

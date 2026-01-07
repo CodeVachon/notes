@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { DateCalendar } from "./date-calendar";
-import { getTodayString } from "@/lib/date-utils";
 
 interface SidebarCalendarProps {
     datesWithContent: string[];
@@ -13,7 +12,8 @@ export function SidebarCalendar({ datesWithContent }: SidebarCalendarProps) {
 
     // Extract date from pathname (e.g., /notebook/2024-12-18)
     const dateMatch = pathname.match(/\/notebook\/(\d{4}-\d{2}-\d{2})/);
-    const selectedDate = dateMatch?.[1] ?? getTodayString();
+    // Don't default to today - pass undefined when not on a notebook date page
+    const selectedDate = dateMatch?.[1];
 
     return <DateCalendar selectedDate={selectedDate} datesWithContent={datesWithContent} />;
 }

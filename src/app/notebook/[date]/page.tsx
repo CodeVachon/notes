@@ -3,7 +3,12 @@ import { Separator } from "@/components/ui/separator";
 import { DailyHeader } from "@/components/notebook/daily-header";
 import { TodoList } from "@/components/notebook/todo-list";
 import { NoteList } from "@/components/notebook/note-list";
-import { getNotesForDate, getTodosForDate, getCommentsForDate } from "@/app/notebook/actions";
+import {
+    getNotesForDate,
+    getTodosForDate,
+    getCommentsForDate,
+    getSourceDatesForTodos
+} from "@/app/notebook/actions";
 import { getAllProjects, getProjectsForItems } from "@/app/projects/actions";
 import { isValidDateString, getTodayString } from "@/lib/date-utils";
 
@@ -27,8 +32,11 @@ export default async function DailyPage({ params }: DailyPageProps) {
         getAllProjects()
     ]);
 
-    // Fetch project assignments for todos and notes
-    const [todoProjects, noteProjects] = await Promise.all([
+    // Get source IDs for todos that were copied
+    const sourceIds = todos.map((t) => t.sourceId).filter((id): id is string => id !== null);
+
+    // Fetch project assignments and source dates in parallel
+    const [todoProjects, noteProjects, sourceDates] = await Promise.all([
         getProjectsForItems(
             "todo",
             todos.map((t) => t.id)
@@ -36,7 +44,8 @@ export default async function DailyPage({ params }: DailyPageProps) {
         getProjectsForItems(
             "note",
             notes.map((n) => n.id)
-        )
+        ),
+        getSourceDatesForTodos(sourceIds)
     ]);
 
     return (
@@ -52,6 +61,7 @@ export default async function DailyPage({ params }: DailyPageProps) {
                         date={date}
                         todoComments={todoComments}
                         todoProjects={todoProjects}
+                        sourceDates={sourceDates}
                         projects={projects}
                     />
 

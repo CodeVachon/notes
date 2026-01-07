@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, and, sql, asc } from "drizzle-orm";
+import { eq, and, sql, asc, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { note, todo, comment, type TodoPriority } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -43,8 +43,8 @@ export async function createNote(data: {
         })
         .returning();
 
-    // Sync tags from content
-    await syncContentTags(user.id, data.content, "note", result[0].id);
+    // Sync tags from title and content
+    await syncContentTags(user.id, `${data.title} ${data.content}`, "note", result[0].id);
 
     // Sync project assignments
     if (data.projectIds && data.projectIds.length > 0) {
@@ -73,9 +73,14 @@ export async function updateNote(
         .returning();
 
     if (result[0]) {
-        // Sync tags from content if content was updated
-        if (data.content !== undefined) {
-            await syncContentTags(user.id, data.content, "note", noteId);
+        // Sync tags from title and content if either was updated
+        if (data.title !== undefined || data.content !== undefined) {
+            await syncContentTags(
+                user.id,
+                `${result[0].title} ${result[0].content}`,
+                "note",
+                noteId
+            );
         }
         // Sync project assignments if provided
         if (data.projectIds !== undefined) {
@@ -138,10 +143,13 @@ export async function createTodo(data: {
         })
         .returning();
 
-    // Sync tags from description if provided
-    if (data.description) {
-        await syncContentTags(user.id, data.description, "todo", result[0].id);
-    }
+    // Sync tags from title and description
+    await syncContentTags(
+        user.id,
+        `${data.title} ${data.description ?? ""}`,
+        "todo",
+        result[0].id
+    );
 
     // Sync project assignments
     if (data.projectIds && data.projectIds.length > 0) {
@@ -186,9 +194,14 @@ export async function updateTodo(
         .returning();
 
     if (result[0]) {
-        // Sync tags from description if description was updated
-        if (data.description !== undefined) {
-            await syncContentTags(user.id, data.description ?? "", "todo", todoId);
+        // Sync tags from title and description if either was updated
+        if (data.title !== undefined || data.description !== undefined) {
+            await syncContentTags(
+                user.id,
+                `${result[0].title} ${result[0].description ?? ""}`,
+                "todo",
+                todoId
+            );
         }
         // Sync project assignments if provided
         if (projectIds !== undefined) {
@@ -254,6 +267,78 @@ export async function getTodosForDate(date: string) {
         .from(todo)
         .where(and(eq(todo.userId, user.id), eq(todo.date, date)))
         .orderBy(asc(todo.completed), asc(priorityOrder), asc(todo.dueTime));
+}
+
+export async function copyTodoToDate(todoId: string, targetDate: string) {
+    const user = await getUser();
+
+    // Fetch source todo
+    const source = await db
+        .select()
+        .from(todo)
+        .where(and(eq(todo.id, todoId), eq(todo.userId, user.id)))
+        .limit(1);
+
+    if (!source[0]) throw new Error("Todo not found");
+
+    // Create new todo with sourceId reference
+    const id = crypto.randomUUID();
+    const result = await db
+        .insert(todo)
+        .values({
+            id,
+            userId: user.id,
+            date: targetDate,
+            title: source[0].title,
+            description: source[0].description,
+            priority: source[0].priority,
+            dueTime: null, // Don't copy time
+            sourceId: source[0].id // Reference to source
+        })
+        .returning();
+
+    // Sync tags from title and description
+    await syncContentTags(
+        user.id,
+        `${result[0].title} ${result[0].description ?? ""}`,
+        "todo",
+        result[0].id
+    );
+
+    revalidatePath(`/notebook/${targetDate}`);
+    revalidatePath("/notebook");
+    return result[0];
+}
+
+export async function getSourceTodoDate(sourceId: string): Promise<string | null> {
+    const user = await getUser();
+
+    const source = await db
+        .select({ date: todo.date })
+        .from(todo)
+        .where(and(eq(todo.id, sourceId), eq(todo.userId, user.id)))
+        .limit(1);
+
+    return source[0]?.date ?? null;
+}
+
+export async function getSourceDatesForTodos(
+    sourceIds: string[]
+): Promise<Record<string, string>> {
+    if (sourceIds.length === 0) return {};
+
+    const user = await getUser();
+
+    const sources = await db
+        .select({ id: todo.id, date: todo.date })
+        .from(todo)
+        .where(and(inArray(todo.id, sourceIds), eq(todo.userId, user.id)));
+
+    const result: Record<string, string> = {};
+    for (const s of sources) {
+        result[s.id] = s.date;
+    }
+    return result;
 }
 
 // ============ Calendar Helpers ============

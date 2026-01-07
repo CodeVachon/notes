@@ -46,7 +46,8 @@ export function createTagSuggestionExtension(
                             );
 
                             // Check if we're inside a tag pattern [[...
-                            const match = textBefore.match(/\[\[([a-zA-Z0-9]*)$/);
+                            // Supports alphanumeric and hyphens for date tags like [[2026-01-07]]
+                            const match = textBefore.match(/\[\[([a-zA-Z0-9-]*)$/);
 
                             if (match) {
                                 const query = match[1];

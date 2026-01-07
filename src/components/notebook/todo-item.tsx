@@ -1,7 +1,8 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
-import { IconDotsVertical, IconTrash, IconPencil } from "@tabler/icons-react";
+import Link from "next/link";
+import { IconDotsVertical, IconTrash, IconPencil, IconLink } from "@tabler/icons-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,8 @@ import { PriorityBadge } from "./priority-badge";
 import { ProjectBadge } from "./project-badge";
 import { HtmlContent } from "./html-content";
 import { CommentSection } from "./comment-section";
+import { TitleWithTags } from "./title-with-tags";
+import { CopyTodoDialog } from "./copy-todo-dialog";
 import { toggleTodo, deleteTodo } from "@/app/notebook/actions";
 import { formatTimeForDisplay } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
@@ -23,10 +26,11 @@ interface TodoItemProps {
     todo: Todo;
     comments: Comment[];
     projects?: Pick<Project, "id" | "name" | "color" | "emoji">[];
+    sourceDate?: string | null; // Date of the source todo if this was copied
     onEdit: (todo: Todo) => void;
 }
 
-export function TodoItem({ todo, comments, projects = [], onEdit }: TodoItemProps) {
+export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: TodoItemProps) {
     const [isPending, startTransition] = useTransition();
     const [optimisticTodo, setOptimisticTodo] = useOptimistic(todo);
 
@@ -67,10 +71,10 @@ export function TodoItem({ todo, comments, projects = [], onEdit }: TodoItemProp
                         <p
                             className={cn(
                                 "text-sm font-medium",
-                                optimisticTodo.completed && "text-muted-foreground line-through"
+                                optimisticTodo.completed && "text-muted-foreground"
                             )}
                         >
-                            {optimisticTodo.title}
+                            <TitleWithTags title={optimisticTodo.title} />
                         </p>
                         {optimisticTodo.description && (
                             <HtmlContent
@@ -85,6 +89,16 @@ export function TodoItem({ todo, comments, projects = [], onEdit }: TodoItemProp
                                     <ProjectBadge key={project.id} project={project} asLink />
                                 ))}
                             </div>
+                        )}
+                        {sourceDate && (
+                            <Link
+                                href={`/notebook/${sourceDate}`}
+                                className="text-muted-foreground hover:text-foreground mt-1.5 flex items-center gap-1 text-xs transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <IconLink className="size-3" />
+                                Copied from {sourceDate}
+                            </Link>
                         )}
                     </div>
 
@@ -111,6 +125,7 @@ export function TodoItem({ todo, comments, projects = [], onEdit }: TodoItemProp
                                     <IconPencil className="size-3.5" />
                                     Edit
                                 </DropdownMenuItem>
+                                <CopyTodoDialog todoId={todo.id} todoTitle={todo.title} />
                                 <DropdownMenuItem onClick={handleDelete} variant="destructive">
                                     <IconTrash className="size-3.5" />
                                     Delete

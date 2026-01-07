@@ -100,6 +100,7 @@ import {
     IconH3,
     IconList,
     IconListNumbers,
+    IconBlockquote,
     IconLink,
     IconCode,
     IconCodeDots
@@ -304,6 +305,15 @@ export function RichTextEditor({
                         <IconListNumbers className="size-3.5" />
                     </Button>
                 )}
+                <Button
+                    type="button"
+                    variant={editor.isActive("blockquote") ? "secondary" : "ghost"}
+                    size="icon-xs"
+                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                    title="Quote"
+                >
+                    <IconBlockquote className="size-3.5" />
+                </Button>
 
                 <Separator orientation="vertical" className="mx-1 h-4" />
 

@@ -5,17 +5,26 @@ import { common, createLowlight } from "lowlight";
 import { toHtml } from "hast-util-to-html";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { YouTubeEmbed } from "./youtube-embed";
+import { extractYouTubeId } from "@/lib/youtube-utils";
 import { cn } from "@/lib/utils";
 
 const lowlight = createLowlight(common);
 
-// Tag detection regex
-const TAG_REGEX = /\[\[([a-zA-Z0-9]+)\]\]/g;
+// Tag detection regex (supports alphanumeric and hyphens for date tags)
+const TAG_REGEX = /\[\[([a-zA-Z0-9-]+)\]\]/g;
+// Date format regex for detecting date tags
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+// YouTube link detection in anchor tags
+const YOUTUBE_LINK_REGEX =
+    /<a[^>]+href="([^"]*(?:youtube\.com\/watch|youtu\.be|youtube\.com\/shorts)[^"]*)"[^>]*>.*?<\/a>/g;
 
 // Convert tags to anchor elements in HTML string (avoids hydration issues with React Link)
+// Date tags link to /notebook/{date}, regular tags link to /tags/{tagname}
 function renderTagsAsHtml(html: string): string {
     return html.replace(TAG_REGEX, (_, tagName: string) => {
-        const href = `/tags/${tagName.toLowerCase()}`;
+        const isDate = DATE_REGEX.test(tagName);
+        const href = isDate ? `/notebook/${tagName}` : `/tags/${tagName.toLowerCase()}`;
         return `<a href="${href}" class="text-primary font-medium hover:underline" data-tag="${tagName}">[[${tagName}]]</a>`;
     });
 }
@@ -71,6 +80,43 @@ function CodeBlock({ code, language }: CodeBlockProps) {
     );
 }
 
+type ContentPart =
+    | { type: "html"; content: string }
+    | { type: "code"; code: string; language?: string }
+    | { type: "youtube"; videoId: string };
+
+// Process HTML content to extract YouTube links as separate parts
+function extractYouTubeParts(htmlContent: string): ContentPart[] {
+    const result: ContentPart[] = [];
+    let lastIndex = 0;
+
+    // Reset regex state
+    YOUTUBE_LINK_REGEX.lastIndex = 0;
+
+    let match;
+    while ((match = YOUTUBE_LINK_REGEX.exec(htmlContent)) !== null) {
+        const url = match[1];
+        const videoId = extractYouTubeId(url);
+
+        if (videoId) {
+            // Add HTML before this YouTube link
+            if (match.index > lastIndex) {
+                result.push({ type: "html", content: htmlContent.slice(lastIndex, match.index) });
+            }
+
+            result.push({ type: "youtube", videoId });
+            lastIndex = match.index + match[0].length;
+        }
+    }
+
+    // Add remaining HTML
+    if (lastIndex < htmlContent.length) {
+        result.push({ type: "html", content: htmlContent.slice(lastIndex) });
+    }
+
+    return result.length > 0 ? result : [{ type: "html", content: htmlContent }];
+}
+
 interface HtmlContentProps {
     content: string;
     className?: string;
@@ -82,7 +128,7 @@ export function HtmlContent({ content, className }: HtmlContentProps) {
 
         const codeBlockRegex =
             /<pre><code(?:\s+class="language-(\w+)")?>([\s\S]*?)<\/code><\/pre>/g;
-        const result: Array<
+        const intermediateResult: Array<
             { type: "html"; content: string } | { type: "code"; code: string; language?: string }
         > = [];
 
@@ -92,7 +138,10 @@ export function HtmlContent({ content, className }: HtmlContentProps) {
         while ((match = codeBlockRegex.exec(content)) !== null) {
             // Add HTML before this code block
             if (match.index > lastIndex) {
-                result.push({ type: "html", content: content.slice(lastIndex, match.index) });
+                intermediateResult.push({
+                    type: "html",
+                    content: content.slice(lastIndex, match.index)
+                });
             }
 
             // Decode HTML entities in code
@@ -103,13 +152,23 @@ export function HtmlContent({ content, className }: HtmlContentProps) {
                 .replace(/&quot;/g, '"')
                 .replace(/&#39;/g, "'");
 
-            result.push({ type: "code", code: decodedCode, language: match[1] });
+            intermediateResult.push({ type: "code", code: decodedCode, language: match[1] });
             lastIndex = match.index + match[0].length;
         }
 
         // Add remaining HTML
         if (lastIndex < content.length) {
-            result.push({ type: "html", content: content.slice(lastIndex) });
+            intermediateResult.push({ type: "html", content: content.slice(lastIndex) });
+        }
+
+        // Process HTML parts to extract YouTube embeds
+        const result: ContentPart[] = [];
+        for (const part of intermediateResult) {
+            if (part.type === "html") {
+                result.push(...extractYouTubeParts(part.content));
+            } else {
+                result.push(part);
+            }
         }
 
         return result;
@@ -119,16 +178,20 @@ export function HtmlContent({ content, className }: HtmlContentProps) {
 
     return (
         <div className={cn("prose prose-sm dark:prose-invert max-w-none", className)}>
-            {parts.map((part, index) =>
-                part.type === "html" ? (
-                    <span
-                        key={index}
-                        dangerouslySetInnerHTML={{ __html: renderTagsAsHtml(part.content) }}
-                    />
-                ) : (
-                    <CodeBlock key={index} code={part.code} language={part.language} />
-                )
-            )}
+            {parts.map((part, index) => {
+                if (part.type === "html") {
+                    return (
+                        <span
+                            key={index}
+                            dangerouslySetInnerHTML={{ __html: renderTagsAsHtml(part.content) }}
+                        />
+                    );
+                }
+                if (part.type === "youtube") {
+                    return <YouTubeEmbed key={index} videoId={part.videoId} />;
+                }
+                return <CodeBlock key={index} code={part.code} language={part.language} />;
+            })}
         </div>
     );
 }

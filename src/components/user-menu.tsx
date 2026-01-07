@@ -49,7 +49,7 @@ export function UserMenu({ user }: UserMenuProps) {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className="hover:bg-accent flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors outline-none">
+            <DropdownMenuTrigger className="hover:bg-accent data-popup-open:bg-accent flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors outline-none">
                 <div className="bg-muted flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full">
                     {user.image ? (
                         <Image
@@ -71,7 +71,7 @@ export function UserMenu({ user }: UserMenuProps) {
                 </div>
                 <IconChevronUp className="text-muted-foreground size-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start" className="w-56">
+            <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-56">
                 <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
                     <IconLogout />
                     Sign out

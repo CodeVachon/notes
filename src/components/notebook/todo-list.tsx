@@ -10,6 +10,7 @@ interface TodoListProps {
     date: string;
     todoComments: Record<string, Comment[]>;
     todoProjects?: Record<string, Project[]>;
+    sourceDates?: Record<string, string>; // Map of todo.sourceId -> source date
     projects?: Project[];
 }
 
@@ -18,6 +19,7 @@ export function TodoList({
     date,
     todoComments,
     todoProjects = {},
+    sourceDates = {},
     projects = []
 }: TodoListProps) {
     const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
@@ -54,6 +56,7 @@ export function TodoList({
                             todo={todo}
                             comments={todoComments[todo.id] ?? []}
                             projects={todoProjects[todo.id] ?? []}
+                            sourceDate={todo.sourceId ? sourceDates[todo.sourceId] : null}
                             onEdit={(t) => setEditingTodo(t)}
                         />
                     ))}
@@ -72,6 +75,7 @@ export function TodoList({
                             todo={todo}
                             comments={todoComments[todo.id] ?? []}
                             projects={todoProjects[todo.id] ?? []}
+                            sourceDate={todo.sourceId ? sourceDates[todo.sourceId] : null}
                             onEdit={(t) => setEditingTodo(t)}
                         />
                     ))}

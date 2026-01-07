@@ -1,0 +1,2 @@
+ALTER TABLE "todo" ADD COLUMN "source_id" text;--> statement-breakpoint
+ALTER TABLE "todo" ADD CONSTRAINT "todo_source_id_todo_id_fk" FOREIGN KEY ("source_id") REFERENCES "public"."todo"("id") ON DELETE set null ON UPDATE no action;
