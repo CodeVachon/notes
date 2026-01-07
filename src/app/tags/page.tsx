@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { getAllTags } from "@/app/tags/actions";
 import { TagsListClient } from "@/components/tags/tags-list-client";
+
+export const metadata: Metadata = {
+    title: "Notes - Tags"
+};
 
 export default async function TagsPage() {
     const tags = await getAllTags();

@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { IconSearch, IconTag } from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 
 interface TagWithCount {
     id: string;
@@ -69,21 +68,21 @@ export function TagsListClient({ tags }: TagsListClientProps) {
                             <h2 className="text-muted-foreground mb-3 text-sm font-medium">
                                 {letter}
                             </h2>
-                            <div className="flex flex-wrap gap-2">
+                            <ul className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                 {letterTags.map((tag) => (
-                                    <Link key={tag.id} href={`/tags/${tag.name}`}>
-                                        <Badge
-                                            variant="outline"
-                                            className="hover:bg-accent cursor-pointer gap-1.5"
+                                    <li key={tag.id}>
+                                        <Link
+                                            href={`/tags/${tag.name}`}
+                                            className="hover:bg-accent flex items-center justify-between rounded px-2 py-1 transition-colors"
                                         >
-                                            <span>[[{tag.name}]]</span>
-                                            <span className="text-muted-foreground">
+                                            <span>{tag.name}</span>
+                                            <span className="text-muted-foreground text-sm">
                                                 {tag.mentionCount}
                                             </span>
-                                        </Badge>
-                                    </Link>
+                                        </Link>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
                     ))}
                 </div>

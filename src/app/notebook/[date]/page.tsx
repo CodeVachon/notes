@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { DailyHeader } from "@/components/notebook/daily-header";
@@ -14,6 +15,13 @@ import { isValidDateString, getTodayString } from "@/lib/date-utils";
 
 interface DailyPageProps {
     params: Promise<{ date: string }>;
+}
+
+export async function generateMetadata({ params }: DailyPageProps): Promise<Metadata> {
+    const { date } = await params;
+    return {
+        title: `Notes - ${date}`
+    };
 }
 
 export default async function DailyPage({ params }: DailyPageProps) {

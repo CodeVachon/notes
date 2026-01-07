@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { IconArrowLeft, IconTag } from "@tabler/icons-react";
@@ -7,6 +8,14 @@ import { TagMentionsClient } from "@/components/tags/tag-mentions-client";
 
 interface TagPageProps {
     params: Promise<{ tagname: string }>;
+}
+
+export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
+    const { tagname } = await params;
+    const decodedTagname = decodeURIComponent(tagname);
+    return {
+        title: `Notes - Tag: ${decodedTagname}`
+    };
 }
 
 export default async function TagPage({ params }: TagPageProps) {
@@ -28,7 +37,7 @@ export default async function TagPage({ params }: TagPageProps) {
                         <IconArrowLeft className="size-4" />
                     </Button>
                 </Link>
-                <h1 className="text-lg font-semibold">[[{decodedTagname}]]</h1>
+                <h1 className="text-lg font-semibold">{decodedTagname}</h1>
                 <span className="text-muted-foreground text-sm">
                     {totalMentions} {totalMentions === 1 ? "mention" : "mentions"}
                 </span>
