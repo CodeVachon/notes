@@ -347,7 +347,9 @@ export function RichTextEditor({
             </div>
 
             {/* Editor */}
-            <EditorContent editor={editor} />
+            <div className="max-h-[32vh] overflow-y-auto">
+                <EditorContent editor={editor} />
+            </div>
 
             {/* Tag Suggestion Popup */}
             {tagSuggestionState && (

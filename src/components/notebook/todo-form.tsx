@@ -111,7 +111,7 @@ export function TodoForm({
             ) : (
                 <AlertDialogTrigger render={defaultTrigger} />
             )}
-            <AlertDialogContent className="max-w-lg">
+            <AlertDialogContent className="max-h-[90vh] max-w-lg overflow-y-auto lg:max-w-2xl">
                 <AlertDialogHeader>
                     <AlertDialogTitle>{isEditing ? "Edit Todo" : "Add Todo"}</AlertDialogTitle>
                     <AlertDialogDescription>

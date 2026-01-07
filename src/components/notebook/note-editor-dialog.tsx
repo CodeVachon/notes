@@ -142,7 +142,7 @@ export function NoteEditorDialog({
             ) : (
                 <AlertDialogTrigger render={defaultTrigger} />
             )}
-            <AlertDialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+            <AlertDialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto lg:max-w-4xl">
                 <AlertDialogHeader>
                     <AlertDialogTitle>{isEditing ? "Edit Note" : "Add Note"}</AlertDialogTitle>
                 </AlertDialogHeader>
