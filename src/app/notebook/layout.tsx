@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { NotebookClientWrapper } from "@/components/notebook/notebook-client-wrapper";
+import { SettingsProvider } from "@/lib/settings-context";
 import { getDatesWithContent } from "./actions";
 import { getSidebarProjects } from "@/app/projects/actions";
+import { getUserSettings } from "@/app/settings/actions";
 
 export default async function NotebookLayout({ children }: { children: React.ReactNode }) {
     let session;
@@ -23,18 +25,21 @@ export default async function NotebookLayout({ children }: { children: React.Rea
         redirect("/sign-in");
     }
 
-    const [datesWithContent, sidebarProjects] = await Promise.all([
+    const [datesWithContent, sidebarProjects, settings] = await Promise.all([
         getDatesWithContent(),
-        getSidebarProjects()
+        getSidebarProjects(),
+        getUserSettings()
     ]);
 
     return (
-        <NotebookClientWrapper
-            user={session.user}
-            datesWithContent={datesWithContent}
-            sidebarProjects={sidebarProjects}
-        >
-            {children}
-        </NotebookClientWrapper>
+        <SettingsProvider settings={settings}>
+            <NotebookClientWrapper
+                user={session.user}
+                datesWithContent={datesWithContent}
+                sidebarProjects={sidebarProjects}
+            >
+                {children}
+            </NotebookClientWrapper>
+        </SettingsProvider>
     );
 }

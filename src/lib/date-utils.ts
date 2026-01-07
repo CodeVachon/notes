@@ -1,4 +1,5 @@
 import { format, parse, isValid, startOfDay, addDays, subDays } from "date-fns";
+import type { TimeFormat } from "@/db/schema";
 
 /**
  * Format a date to YYYY-MM-DD for database storage and URL params
@@ -59,12 +60,17 @@ export function isValidDateString(dateString: string): boolean {
 }
 
 /**
- * Format time for display (e.g., "2:30 PM")
+ * Format time for display based on user preference
+ * @param time - Time string in HH:mm format
+ * @param timeFormat - "12h" for 12-hour (2:30 PM) or "24h" for 24-hour (14:30)
  */
-export function formatTimeForDisplay(time: string | null): string | null {
+export function formatTimeForDisplay(
+    time: string | null,
+    timeFormat: TimeFormat = "12h"
+): string | null {
     if (!time) return null;
     const [hours, minutes] = time.split(":").map(Number);
     const date = new Date();
     date.setHours(hours, minutes);
-    return format(date, "h:mm a");
+    return timeFormat === "24h" ? format(date, "HH:mm") : format(date, "h:mm a");
 }

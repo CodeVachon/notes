@@ -29,6 +29,13 @@
       "when": 1767792764389,
       "tag": "0003_curly_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1767806009146,
+      "tag": "0004_absurd_switch",
+      "breakpoints": true
     }
   ]
 }

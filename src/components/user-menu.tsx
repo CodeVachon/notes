@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { IconLogout, IconChevronUp } from "@tabler/icons-react";
+import { IconLogout, IconChevronUp, IconSettings } from "@tabler/icons-react";
 
 import { signOut } from "@/lib/auth-client";
 import { useMounted } from "@/lib/use-mounted";
@@ -10,8 +11,10 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { SettingsDrawer } from "@/components/settings/settings-drawer";
 
 interface UserMenuProps {
     user: {
@@ -24,10 +27,15 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
     const router = useRouter();
     const mounted = useMounted();
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     const handleSignOut = async () => {
         await signOut();
         router.push("/sign-in");
+    };
+
+    const handleOpenSettings = () => {
+        setSettingsOpen(true);
     };
 
     // Render placeholder during SSR to avoid hydration mismatch
@@ -48,6 +56,7 @@ export function UserMenu({ user }: UserMenuProps) {
     }
 
     return (
+        <>
         <DropdownMenu>
             <DropdownMenuTrigger className="hover:bg-accent data-popup-open:bg-accent flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors outline-none">
                 <div className="bg-muted flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full">
@@ -72,11 +81,19 @@ export function UserMenu({ user }: UserMenuProps) {
                 <IconChevronUp className="text-muted-foreground size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-56">
+                <DropdownMenuItem onClick={handleOpenSettings}>
+                    <IconSettings />
+                    Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
                     <IconLogout />
                     Sign out
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
+
+        <SettingsDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
     );
 }

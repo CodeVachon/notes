@@ -19,6 +19,7 @@ import { TitleWithTags } from "./title-with-tags";
 import { CopyTodoDialog } from "./copy-todo-dialog";
 import { toggleTodo, deleteTodo } from "@/app/notebook/actions";
 import { formatTimeForDisplay } from "@/lib/date-utils";
+import { useSettings } from "@/lib/settings-context";
 import { cn } from "@/lib/utils";
 import type { Todo, Comment, Project } from "@/db/schema";
 
@@ -33,6 +34,7 @@ interface TodoItemProps {
 export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: TodoItemProps) {
     const [isPending, startTransition] = useTransition();
     const [optimisticTodo, setOptimisticTodo] = useOptimistic(todo);
+    const { settings } = useSettings();
 
     const handleToggle = () => {
         startTransition(async () => {
@@ -47,7 +49,7 @@ export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: 
         });
     };
 
-    const formattedTime = formatTimeForDisplay(optimisticTodo.dueTime);
+    const formattedTime = formatTimeForDisplay(optimisticTodo.dueTime, settings.timeFormat);
 
     return (
         <div
