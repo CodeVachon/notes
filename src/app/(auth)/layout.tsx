@@ -17,7 +17,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
     }
 
     if (session) {
-        redirect("/");
+        redirect("/notebook");
     }
 
     return (
