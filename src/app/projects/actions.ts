@@ -337,8 +337,11 @@ export async function getProjectItems(projectId: string): Promise<ProjectItemsDa
         }
     }
 
-    // Get unique dates sorted newest first
-    const allDates = new Set([...notes.map((n) => n.date), ...todos.map((t) => t.date)]);
+    // Get unique dates sorted newest first (filter out null dates from generic notes)
+    const allDates = new Set([
+        ...notes.map((n) => n.date).filter((d): d is string => d !== null),
+        ...todos.map((t) => t.date)
+    ]);
     const dates = Array.from(allDates).sort((a, b) => b.localeCompare(a));
 
     return {

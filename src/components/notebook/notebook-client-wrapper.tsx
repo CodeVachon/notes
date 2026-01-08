@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconTag, IconFolder } from "@tabler/icons-react";
+import { IconTag, IconFolder, IconFileText } from "@tabler/icons-react";
 import { CommandPaletteProvider } from "@/components/command-palette/command-palette-provider";
 import { CommandPalette } from "@/components/command-palette/command-palette";
 import { CommandPaletteTrigger } from "@/components/command-palette/command-palette-trigger";
@@ -49,6 +49,7 @@ export function NotebookClientWrapper({
     const pathname = usePathname();
     const isTagsPage = pathname?.startsWith("/tags");
     const isProjectsPage = pathname?.startsWith("/projects");
+    const isNotesPage = pathname?.startsWith("/notebook/notes");
 
     return (
         <CommandPaletteProvider>
@@ -109,6 +110,19 @@ export function NotebookClientWrapper({
                                     ))}
                                 </div>
                             )}
+
+                            <Link href="/notebook/notes">
+                                <Button
+                                    variant="ghost"
+                                    className={cn(
+                                        "w-full justify-start gap-2",
+                                        isNotesPage && "bg-accent"
+                                    )}
+                                >
+                                    <IconFileText className="size-4" />
+                                    Notes
+                                </Button>
+                            </Link>
                         </div>
                     </nav>
                     <div className="space-y-1 p-2">

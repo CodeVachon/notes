@@ -219,6 +219,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("bold") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={() => editor.chain().focus().toggleBold().run()}
                 >
                     <IconBold className="size-3.5" />
@@ -227,6 +228,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("italic") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={() => editor.chain().focus().toggleItalic().run()}
                 >
                     <IconItalic className="size-3.5" />
@@ -237,6 +239,7 @@ export function RichTextEditor({
                             type="button"
                             variant={editor.isActive("underline") ? "secondary" : "ghost"}
                             size="icon-xs"
+                            tabIndex={-1}
                             onClick={() => editor.chain().focus().toggleUnderline().run()}
                         >
                             <IconUnderline className="size-3.5" />
@@ -245,6 +248,7 @@ export function RichTextEditor({
                             type="button"
                             variant={editor.isActive("strike") ? "secondary" : "ghost"}
                             size="icon-xs"
+                            tabIndex={-1}
                             onClick={() => editor.chain().focus().toggleStrike().run()}
                         >
                             <IconStrikethrough className="size-3.5" />
@@ -258,6 +262,7 @@ export function RichTextEditor({
                                 editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"
                             }
                             size="icon-xs"
+                            tabIndex={-1}
                             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                         >
                             <IconH1 className="size-3.5" />
@@ -268,6 +273,7 @@ export function RichTextEditor({
                                 editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"
                             }
                             size="icon-xs"
+                            tabIndex={-1}
                             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                         >
                             <IconH2 className="size-3.5" />
@@ -278,6 +284,7 @@ export function RichTextEditor({
                                 editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"
                             }
                             size="icon-xs"
+                            tabIndex={-1}
                             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
                         >
                             <IconH3 className="size-3.5" />
@@ -291,6 +298,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("bulletList") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                 >
                     <IconList className="size-3.5" />
@@ -300,6 +308,7 @@ export function RichTextEditor({
                         type="button"
                         variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
                         size="icon-xs"
+                        tabIndex={-1}
                         onClick={() => editor.chain().focus().toggleOrderedList().run()}
                     >
                         <IconListNumbers className="size-3.5" />
@@ -309,6 +318,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("blockquote") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={() => editor.chain().focus().toggleBlockquote().run()}
                     title="Quote"
                 >
@@ -321,6 +331,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("code") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={() => editor.chain().focus().toggleCode().run()}
                     title="Inline Code"
                 >
@@ -330,6 +341,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("codeBlock") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
                     title="Code Block (SQL default)"
                 >
@@ -339,6 +351,7 @@ export function RichTextEditor({
                     type="button"
                     variant={editor.isActive("link") ? "secondary" : "ghost"}
                     size="icon-xs"
+                    tabIndex={-1}
                     onClick={setLink}
                     title="Link"
                 >

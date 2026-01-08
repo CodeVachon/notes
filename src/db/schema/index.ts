@@ -3,6 +3,7 @@ export * from "./session";
 export * from "./account";
 export * from "./verification";
 export * from "./todo";
+export * from "./note-folder";
 export * from "./note";
 export * from "./comment";
 export * from "./tag";

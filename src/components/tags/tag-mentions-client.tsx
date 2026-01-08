@@ -27,11 +27,12 @@ export function TagMentionsClient({
     const [editingNote, setEditingNote] = useState<Note | null>(null);
     const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
-    // Group notes and todos by date
+    // Group notes and todos by date (filter out generic notes with null date)
     const notesByDate = new Map<string, Note[]>();
     const todosByDate = new Map<string, Todo[]>();
 
     for (const n of notes) {
+        if (n.date === null) continue; // Skip generic notes (they don't have dates)
         if (!notesByDate.has(n.date)) notesByDate.set(n.date, []);
         notesByDate.get(n.date)!.push(n);
     }

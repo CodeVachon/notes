@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, and, sql, asc, inArray } from "drizzle-orm";
+import { eq, and, sql, asc, inArray, isNotNull } from "drizzle-orm";
 import { db } from "@/db";
 import { note, todo, comment, type TodoPriority } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -113,7 +113,7 @@ export async function getNotesForDate(date: string) {
     return db
         .select()
         .from(note)
-        .where(and(eq(note.userId, user.id), eq(note.date, date)))
+        .where(and(eq(note.userId, user.id), eq(note.date, date), isNotNull(note.date)))
         .orderBy(note.createdAt);
 }
 
@@ -343,20 +343,24 @@ export async function getSourceDatesForTodos(
 
 // ============ Calendar Helpers ============
 
-export async function getDatesWithContent() {
+export async function getDatesWithContent(): Promise<string[]> {
     const user = await getUser();
 
+    // Only get notes with dates (not generic notes which have null date)
     const noteDates = await db
         .selectDistinct({ date: note.date })
         .from(note)
-        .where(eq(note.userId, user.id));
+        .where(and(eq(note.userId, user.id), isNotNull(note.date)));
 
     const todoDates = await db
         .selectDistinct({ date: todo.date })
         .from(todo)
         .where(eq(todo.userId, user.id));
 
-    const allDates = new Set([...noteDates.map((n) => n.date), ...todoDates.map((t) => t.date)]);
+    const allDates = new Set([
+        ...noteDates.map((n) => n.date).filter((d): d is string => d !== null),
+        ...todoDates.map((t) => t.date)
+    ]);
 
     return Array.from(allDates);
 }
