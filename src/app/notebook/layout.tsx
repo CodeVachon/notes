@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
@@ -15,9 +15,8 @@ export default async function NotebookLayout({ children }: { children: React.Rea
             headers: await headers()
         });
     } catch {
-        // Session token exists but record is missing/expired - clear stale cookie and redirect
-        const cookieStore = await cookies();
-        cookieStore.delete("better-auth.session_token");
+        // Session token exists but record is missing/expired - redirect to sign-in
+        // Better Auth will handle the stale cookie during the next sign-in
         redirect("/sign-in");
     }
 
