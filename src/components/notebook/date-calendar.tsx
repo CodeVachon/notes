@@ -37,7 +37,8 @@ export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalend
 
     return (
         <div className="flex flex-col space-y-2">
-            <Calendar
+            <div className="flex-shrink-0">
+                <Calendar
                 mode="single"
                 selected={selected}
                 onSelect={handleSelect}
@@ -60,6 +61,7 @@ export function DateCalendar({ selectedDate, datesWithContent = [] }: DateCalend
                     day: "relative flex-1 rounded-(--cell-radius) h-full p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius) group/day aspect-square select-none [&:first-child[data-selected=true]_button]:rounded-l-(--cell-radius)"
                 }}
             />
+            </div>
             <Button
                 variant="outline"
                 size="sm"
