@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-01-08
+
+### New Features
+
+- **Generic Notes with Folder Structure** - Added support for organizing notes in folders
+- **Cross Tab/Browser Syncing** - Notes now sync across multiple browser tabs and windows
+- **Deployment Examples** - Added deployment configuration examples
+
+### Improvements
+
+- Updated landing page design
+
+### Bug Fixes
+
+- Fixed navigation issues
+- Fixed "Go to Today" button on Safari
+- Fixed cookie error on session expiration
+
 ## [0.2.1] - 2026-01-07
 
 ### Bug Fixes
