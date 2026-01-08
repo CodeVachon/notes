@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { NotebookClientWrapper } from "@/components/notebook/notebook-client-wrapper";
 import { SettingsProvider } from "@/lib/settings-context";
+import { SyncProvider } from "@/components/sync-provider";
 import { getDatesWithContent } from "@/app/notebook/actions";
 import { getSidebarProjects } from "@/app/projects/actions";
 import { getUserSettings } from "@/app/settings/actions";
@@ -33,13 +34,15 @@ export default async function TagsLayout({ children }: { children: React.ReactNo
 
     return (
         <SettingsProvider settings={settings}>
-            <NotebookClientWrapper
-                user={session.user}
-                datesWithContent={datesWithContent}
-                sidebarProjects={sidebarProjects}
-            >
-                {children}
-            </NotebookClientWrapper>
+            <SyncProvider>
+                <NotebookClientWrapper
+                    user={session.user}
+                    datesWithContent={datesWithContent}
+                    sidebarProjects={sidebarProjects}
+                >
+                    {children}
+                </NotebookClientWrapper>
+            </SyncProvider>
         </SettingsProvider>
     );
 }
