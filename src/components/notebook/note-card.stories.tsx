@@ -18,7 +18,7 @@ const mockNote: Note = {
 const mockComments: Comment[] = [];
 
 const mockProjects: Pick<Project, "id" | "name" | "color" | "emoji">[] = [
-    { id: "proj-1", name: "Work", color: "#3b82f6", emoji: "💼" }
+    { id: "proj-1", name: "Work", color: "blue", emoji: "💼" }
 ];
 
 const meta: Meta<typeof NoteCard> = {
@@ -95,8 +95,8 @@ export const WithMultipleProjects: Story = {
     args: {
         note: mockNote,
         projects: [
-            { id: "proj-1", name: "Work", color: "#3b82f6", emoji: "💼" },
-            { id: "proj-2", name: "Documentation", color: "#8b5cf6", emoji: "📝" }
+            { id: "proj-1", name: "Work", color: "blue", emoji: "💼" },
+            { id: "proj-2", name: "Documentation", color: "purple", emoji: "📝" }
         ]
     }
 };
@@ -155,8 +155,8 @@ export const FullyLoaded: Story = {
             `
         },
         projects: [
-            { id: "proj-1", name: "Product", color: "#f59e0b", emoji: "🚀" },
-            { id: "proj-2", name: "Strategy", color: "#10b981", emoji: "📊" }
+            { id: "proj-1", name: "Product", color: "orange", emoji: "🚀" },
+            { id: "proj-2", name: "Strategy", color: "green", emoji: "📊" }
         ],
         comments: [
             {

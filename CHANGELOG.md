@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-01-09
+
+### New Features
+
+- **Storybook Integration** - Added Storybook for component development and documentation
+
+### Bug Fixes
+
+- Fixed Safari calendar date picker error
+
 ## [0.3.0] - 2026-01-08
 
 ### New Features
