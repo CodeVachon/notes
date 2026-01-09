@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,6 +20,14 @@ export function DateCalendar({
     onTodayClick,
     showTodayButton = true
 }: DateCalendarProps) {
+    const [isSafari, setIsSafari] = useState(false);
+
+    useEffect(() => {
+        // Detect Safari: includes Safari but excludes Chrome/Chromium-based browsers
+        const ua = navigator.userAgent;
+        setIsSafari(/^((?!chrome|android).)*safari/i.test(ua));
+    }, []);
+
     const handleSelect = (date: Date | undefined) => {
         if (date && onDateSelect) {
             onDateSelect(date);
@@ -24,8 +35,8 @@ export function DateCalendar({
     };
 
     return (
-        <div className="flex flex-col space-y-2">
-            <div className="flex-shrink-0">
+        <div className="grid gap-2">
+            <div style={isSafari ? { minHeight: 370 } : undefined}>
                 <Calendar
                     mode="single"
                     selected={selectedDate}

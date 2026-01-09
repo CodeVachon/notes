@@ -122,7 +122,7 @@ function Calendar({
                         <div
                             data-slot="calendar"
                             ref={rootRef}
-                            className={cn("relative", className)}
+                            className={cn("relative isolate block", className)}
                             {...props}
                         />
                     );
