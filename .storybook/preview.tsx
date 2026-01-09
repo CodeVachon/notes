@@ -1,5 +1,11 @@
 import type { Preview } from "@storybook/nextjs-vite";
+import { Buffer } from "buffer";
 import "../src/styles/globals.css";
+
+// Polyfill Buffer for browser environment
+if (typeof window !== "undefined") {
+    window.Buffer = Buffer;
+}
 
 const preview: Preview = {
     parameters: {

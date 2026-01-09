@@ -185,6 +185,10 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
             }
         };
 
+
+
+
+
         return (
             <Command className="rounded-xl">
                 <div className="flex items-center gap-2 border-b p-3">

@@ -14,6 +14,22 @@ const config: StorybookConfig = {
   "framework": "@storybook/nextjs-vite",
   "staticDirs": [
     "../public"
-  ]
+  ],
+  async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
+    return mergeConfig(config, {
+      define: {
+        'Buffer': ['buffer', 'Buffer'],
+      },
+      resolve: {
+        alias: {
+          buffer: 'buffer/',
+        },
+      },
+      optimizeDeps: {
+        include: ['buffer'],
+      },
+    });
+  },
 };
 export default config;
