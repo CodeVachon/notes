@@ -44,6 +44,11 @@ Dockerfile*
 docker-compose*.yml
 .dockerignore
 
+# Storybook
+.storybook
+**/*.stories.tsx
+**/*.stories.ts
+
 # Misc
 README.md
 *.md
