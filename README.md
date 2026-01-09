@@ -5,12 +5,14 @@ A personal note-taking and task management application built with Next.js 16. Fe
 ## Features
 
 ### Daily Notebook
+
 - Date-based note-taking interface with calendar navigation
 - Navigate between dates with previous/next buttons
 - Smart date labels ("Today", "Yesterday", "Tomorrow")
 - Calendar view showing dates with existing content
 
 ### Todo Management
+
 - Create, edit, and delete todos for each day
 - Priority levels (low, medium, high) with visual badges
 - Due time support
@@ -19,34 +21,39 @@ A personal note-taking and task management application built with Next.js 16. Fe
 - Rich-text descriptions
 
 ### Notes
+
 - Rich-text notes with HTML content
 - Tiptap editor with extensive formatting:
-  - Text styles (bold, italic, underline, strikethrough)
-  - Headings (H1, H2, H3)
-  - Bulleted and numbered lists
-  - Code blocks with syntax highlighting
-  - Links, quotes, and dividers
-  - YouTube video embedding
-  - Markdown shortcuts
+    - Text styles (bold, italic, underline, strikethrough)
+    - Headings (H1, H2, H3)
+    - Bulleted and numbered lists
+    - Code blocks with syntax highlighting
+    - Links, quotes, and dividers
+    - YouTube video embedding
+    - Markdown shortcuts
 
 ### Comments
+
 - Add comments to both todos and notes
 - Rich-text editing for comments
 - Edit and delete functionality
 
 ### Tag System
+
 - Automatic tag extraction using `[[tagname]]` syntax
 - Tag autocomplete with suggestions
 - Tag pages showing all mentions across notes, todos, and comments
 - Tags overview page with mention counts
 
 ### Projects
+
 - Create projects with custom colors and emoji icons
 - Assign notes and todos to multiple projects
 - Project pages displaying all assigned items
 - Sidebar visibility toggle
 
 ### Authentication
+
 - GitHub OAuth via Better Auth
 - Private application with allowed user restriction
 
@@ -95,9 +102,9 @@ cp .env.example .env
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Click **"New OAuth App"** (or go to OAuth Apps > New OAuth App)
 3. Fill in the application details:
-   - **Application name**: Notes (or any name you prefer)
-   - **Homepage URL**: `http://localhost:3000`
-   - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
+    - **Application name**: Notes (or any name you prefer)
+    - **Homepage URL**: `http://localhost:3000`
+    - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
 4. Click **"Register application"**
 5. On the next page, copy the **Client ID**
 6. Click **"Generate a new client secret"** and copy the secret
@@ -152,13 +159,13 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with GitHub.
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `BETTER_AUTH_SECRET` | Secret key for Better Auth session encryption |
-| `BETTER_AUTH_URL` | Base URL of the application |
-| `GITHUB_CLIENT_ID` | GitHub OAuth application client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth application client secret |
+| Variable                  | Description                                              |
+| ------------------------- | -------------------------------------------------------- |
+| `DATABASE_URL`            | PostgreSQL connection string                             |
+| `BETTER_AUTH_SECRET`      | Secret key for Better Auth session encryption            |
+| `BETTER_AUTH_URL`         | Base URL of the application                              |
+| `GITHUB_CLIENT_ID`        | GitHub OAuth application client ID                       |
+| `GITHUB_CLIENT_SECRET`    | GitHub OAuth application client secret                   |
 | `ALLOWED_GITHUB_USERNAME` | GitHub username(s) allowed to sign in (case-insensitive) |
 
 ## Available Commands
@@ -192,8 +199,8 @@ For production deployment:
 
 1. Set `BETTER_AUTH_URL` to your production domain
 2. Update the GitHub OAuth app with production URLs:
-   - Homepage URL: `https://your-domain.com`
-   - Callback URL: `https://your-domain.com/api/auth/callback/github`
+    - Homepage URL: `https://your-domain.com`
+    - Callback URL: `https://your-domain.com/api/auth/callback/github`
 3. Use `bun run db:migrate` instead of `db:push` for production databases
 4. Run `bun run build` followed by `bun run start`
 

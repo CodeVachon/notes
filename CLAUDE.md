@@ -67,6 +67,7 @@ import { db } from "@/db";
 Drizzle ORM with PostgreSQL. Schema defined in `src/db/schema/` with tables for users, sessions, todos, notes, comments, tags, and projects. Database connection in `src/db/index.ts`.
 
 Schema changes workflow:
+
 1. Edit schema files in `src/db/schema/`
 2. Run `bun run db:generate` to create migration
 3. Run `bun run db:push` (dev) or `bun run db:migrate` (prod)
@@ -74,6 +75,7 @@ Schema changes workflow:
 ### Server Actions
 
 Server actions are co-located with their routes in `actions.ts` files:
+
 - `src/app/notebook/actions.ts` - Todo, note, and comment CRUD
 - `src/app/projects/actions.ts` - Project management
 - `src/app/tags/actions.ts` - Tag extraction and syncing

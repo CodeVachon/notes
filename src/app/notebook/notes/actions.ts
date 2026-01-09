@@ -192,7 +192,9 @@ export async function deleteFolder(folderId: string) {
     const totalContents = (childFolders[0]?.count ?? 0) + (childNotes[0]?.count ?? 0);
 
     if (totalContents > 0) {
-        throw new Error("Cannot delete folder with contents. Please move or delete all items first.");
+        throw new Error(
+            "Cannot delete folder with contents. Please move or delete all items first."
+        );
     }
 
     const deleted = await db
@@ -287,9 +289,7 @@ async function checkIsDescendant(
     return false;
 }
 
-export async function getFolderByPath(
-    pathSegments: string[]
-): Promise<NoteFolder | null> {
+export async function getFolderByPath(pathSegments: string[]): Promise<NoteFolder | null> {
     const user = await getUser();
 
     let currentFolder: NoteFolder | null = null;
@@ -362,9 +362,9 @@ export async function getFolderContents(folderId: string | null): Promise<{
     return { folder, childFolders, notes };
 }
 
-export async function getFolderBreadcrumbs(folderId: string | null): Promise<
-    Array<{ id: string; name: string; slug: string }>
-> {
+export async function getFolderBreadcrumbs(
+    folderId: string | null
+): Promise<Array<{ id: string; name: string; slug: string }>> {
     if (!folderId) return [];
 
     const user = await getUser();
@@ -531,12 +531,7 @@ export async function moveGenericNote(noteId: string, targetFolderId: string | n
     if (!existing[0]) throw new Error("Note not found");
 
     // Check if slug is available in target location
-    const slugAvailable = await isSlugAvailable(
-        user.id,
-        existing[0].slug!,
-        targetFolderId,
-        noteId
-    );
+    const slugAvailable = await isSlugAvailable(user.id, existing[0].slug!, targetFolderId, noteId);
     if (!slugAvailable) {
         throw new Error("A folder or note with this name already exists in the target location");
     }
@@ -681,9 +676,7 @@ export async function resolvePathToItem(pathSegments: string[]): Promise<{
                         eq(note.userId, user.id),
                         isNull(note.date),
                         eq(note.slug, segment),
-                        currentFolder
-                            ? eq(note.folderId, currentFolder.id)
-                            : isNull(note.folderId)
+                        currentFolder ? eq(note.folderId, currentFolder.id) : isNull(note.folderId)
                     )
                 )
                 .limit(1);
@@ -718,9 +711,7 @@ export async function getAllFolders(): Promise<NoteFolder[]> {
 
 // ============ Folder Item Counts ============
 
-export async function getFolderItemCounts(
-    folderIds: string[]
-): Promise<Record<string, number>> {
+export async function getFolderItemCounts(folderIds: string[]): Promise<Record<string, number>> {
     if (folderIds.length === 0) return {};
 
     const user = await getUser();

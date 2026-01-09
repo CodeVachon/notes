@@ -32,20 +32,14 @@ function applyDerivedColors(primary: OklchColor) {
 
     // Sidebar primary (slightly different lightness)
     root.style.setProperty("--sidebar-primary", `oklch(${Math.min(l + 0.09, 0.95)} ${c} ${h})`);
-    root.style.setProperty(
-        "--sidebar-primary-foreground",
-        `oklch(${fgL} ${c * 0.3} ${h})`
-    );
+    root.style.setProperty("--sidebar-primary-foreground", `oklch(${fgL} ${c * 0.3} ${h})`);
 
     // Chart colors - variations of the primary
     root.style.setProperty(
         "--chart-1",
         `oklch(${Math.min(l + 0.16, 0.95)} ${Math.max(c - 0.01, 0)} ${h - 8})`
     );
-    root.style.setProperty(
-        "--chart-2",
-        `oklch(${Math.min(l + 0.09, 0.95)} ${c} ${h - 3})`
-    );
+    root.style.setProperty("--chart-2", `oklch(${Math.min(l + 0.09, 0.95)} ${c} ${h - 3})`);
     root.style.setProperty("--chart-3", `oklch(${l} ${c} ${h})`);
     root.style.setProperty(
         "--chart-4",
@@ -126,7 +120,7 @@ export function OklchColorPicker({
                         value={color.l}
                         onChange={(e) => handleChange("l", e.target.value)}
                         disabled={disabled}
-                        className="bg-muted h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full"
+                        className="bg-muted [&::-webkit-slider-thumb]:bg-primary h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full"
                     />
                     <p className="text-muted-foreground text-xs">
                         Controls brightness (0 = black, 1 = white)
@@ -143,7 +137,7 @@ export function OklchColorPicker({
                         value={color.c}
                         onChange={(e) => handleChange("c", e.target.value)}
                         disabled={disabled}
-                        className="bg-muted h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full"
+                        className="bg-muted [&::-webkit-slider-thumb]:bg-primary h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full"
                     />
                     <p className="text-muted-foreground text-xs">Controls saturation intensity</p>
                 </div>
@@ -158,7 +152,7 @@ export function OklchColorPicker({
                         value={color.h}
                         onChange={(e) => handleChange("h", e.target.value)}
                         disabled={disabled}
-                        className="bg-muted h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full"
+                        className="bg-muted [&::-webkit-slider-thumb]:bg-primary h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full"
                     />
                     <p className="text-muted-foreground text-xs">
                         Color wheel position (0=red, 120=green, 240=blue)

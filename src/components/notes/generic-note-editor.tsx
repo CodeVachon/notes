@@ -194,11 +194,7 @@ export function GenericNoteEditor({
                             {selectedProjects.length > 0 && (
                                 <div className="flex flex-wrap gap-2">
                                     {selectedProjects.map((project) => (
-                                        <ProjectBadge
-                                            key={project.id}
-                                            project={project}
-                                            asLink
-                                        />
+                                        <ProjectBadge key={project.id} project={project} asLink />
                                     ))}
                                 </div>
                             )}

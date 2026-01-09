@@ -75,9 +75,7 @@ export function SortableNoteCard({
     const notePath = basePath ? `${basePath}/${note.slug}` : note.slug;
 
     // Strip HTML and truncate for preview
-    const contentPreview = note.content
-        ? note.content.replace(/<[^>]*>/g, "").slice(0, 150)
-        : "";
+    const contentPreview = note.content ? note.content.replace(/<[^>]*>/g, "").slice(0, 150) : "";
 
     return (
         <div ref={setNodeRef} style={style} {...attributes}>
@@ -86,7 +84,7 @@ export function SortableNoteCard({
                 className={cn(
                     "group hover:ring-primary/20 transition-all hover:ring-2",
                     isPending && "pointer-events-none opacity-50",
-                    isDragging && "opacity-50 ring-2 ring-primary"
+                    isDragging && "ring-primary opacity-50 ring-2"
                 )}
             >
                 <Link href={`/notebook/notes/${notePath}`} className="block">
@@ -121,7 +119,10 @@ export function SortableNoteCard({
                                 >
                                     <IconDotsVertical className="size-3.5" />
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenuContent
+                                    align="end"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <DropdownMenuItem
                                         onClick={(e) => {
                                             e.preventDefault();

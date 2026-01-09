@@ -16,6 +16,7 @@ When the user asks to create a release, follow these steps:
 Use the AskUserQuestion tool to ask the user what type of release this is:
 
 **Options:**
+
 - **Patch** (x.x.X) - Bug fixes and minor changes that don't add features
 - **Minor** (x.X.0) - New features that are backwards compatible
 - **Major** (X.0.0) - Breaking changes or major new features
@@ -23,6 +24,7 @@ Use the AskUserQuestion tool to ask the user what type of release this is:
 ### Step 2: Calculate New Version
 
 Read `package.json` to get the current version. Parse the semantic version (MAJOR.MINOR.PATCH) and increment the appropriate number:
+
 - Patch: increment PATCH, keep MAJOR and MINOR
 - Minor: increment MINOR, reset PATCH to 0, keep MAJOR
 - Major: increment MAJOR, reset MINOR and PATCH to 0
@@ -35,15 +37,19 @@ Use AskUserQuestion or ask the user directly what changes should be documented i
 ## [VERSION] - YYYY-MM-DD
 
 ### New Features
+
 - Feature descriptions here
 
 ### Improvements
+
 - Improvement descriptions here
 
 ### Bug Fixes
+
 - Bug fix descriptions here
 
 ### Database Changes
+
 - Any schema changes here (remind to run migrations)
 ```
 
@@ -64,6 +70,7 @@ bun run db:generate
 ```
 
 If new migrations are generated:
+
 - Inform the user that new migrations were created
 - Remind them to run `bun run db:push` (dev) or `bun run db:migrate` (prod) after deployment
 
@@ -72,6 +79,7 @@ If no changes are detected, confirm that migrations are up to date.
 ### Step 6: Summary
 
 Provide a summary of what was done:
+
 - Old version -> New version
 - Changelog entries added
 - Migration status
@@ -85,12 +93,14 @@ Provide a summary of what was done:
 ### New Features
 
 **Feature Name**
+
 - Description of the feature
 - Additional details
 
 ### Improvements
 
 **Area of Improvement**
+
 - What was improved
 
 ### Database Changes

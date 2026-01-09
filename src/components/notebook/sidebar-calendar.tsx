@@ -17,7 +17,9 @@ export function SidebarCalendar({ datesWithContent }: SidebarCalendarProps) {
     const selectedDateString = dateMatch?.[1];
 
     // Convert string date to Date object
-    const selectedDate = selectedDateString ? parseDateString(selectedDateString) ?? undefined : undefined;
+    const selectedDate = selectedDateString
+        ? (parseDateString(selectedDateString) ?? undefined)
+        : undefined;
 
     // Convert date strings to Date objects for content indicators
     const contentDates = datesWithContent

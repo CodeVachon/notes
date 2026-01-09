@@ -144,12 +144,7 @@ export async function createTodo(data: {
         .returning();
 
     // Sync tags from title and description
-    await syncContentTags(
-        user.id,
-        `${data.title} ${data.description ?? ""}`,
-        "todo",
-        result[0].id
-    );
+    await syncContentTags(user.id, `${data.title} ${data.description ?? ""}`, "todo", result[0].id);
 
     // Sync project assignments
     if (data.projectIds && data.projectIds.length > 0) {
@@ -322,9 +317,7 @@ export async function getSourceTodoDate(sourceId: string): Promise<string | null
     return source[0]?.date ?? null;
 }
 
-export async function getSourceDatesForTodos(
-    sourceIds: string[]
-): Promise<Record<string, string>> {
+export async function getSourceDatesForTodos(sourceIds: string[]): Promise<Record<string, string>> {
     if (sourceIds.length === 0) return {};
 
     const user = await getUser();

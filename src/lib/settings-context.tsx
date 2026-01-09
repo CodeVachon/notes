@@ -42,10 +42,7 @@ function applyDerivedColors(primary: { l: string; c: string; h: string }) {
         "--chart-1",
         `oklch(${Math.min(l + 0.16, 0.95)} ${Math.max(c - 0.01, 0)} ${h - 8})`
     );
-    root.style.setProperty(
-        "--chart-2",
-        `oklch(${Math.min(l + 0.09, 0.95)} ${c} ${h - 3})`
-    );
+    root.style.setProperty("--chart-2", `oklch(${Math.min(l + 0.09, 0.95)} ${c} ${h - 3})`);
     root.style.setProperty("--chart-3", `oklch(${l} ${c} ${h})`);
     root.style.setProperty(
         "--chart-4",

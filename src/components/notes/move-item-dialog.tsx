@@ -212,7 +212,9 @@ export function MoveItemDialog({
                 </AlertDialogHeader>
 
                 <div className="py-2">
-                    <p className="text-muted-foreground mb-3 text-sm">Select a destination folder:</p>
+                    <p className="text-muted-foreground mb-3 text-sm">
+                        Select a destination folder:
+                    </p>
 
                     {isLoading ? (
                         <div className="text-muted-foreground py-8 text-center text-sm">
@@ -225,7 +227,9 @@ export function MoveItemDialog({
                                 type="button"
                                 className={cn(
                                     "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors",
-                                    isRootSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                                    isRootSelected
+                                        ? "bg-primary text-primary-foreground"
+                                        : "hover:bg-muted",
                                     isCurrentRoot && !isRootSelected && "text-muted-foreground"
                                 )}
                                 onClick={() => setSelectedFolderId(null)}
@@ -234,7 +238,9 @@ export function MoveItemDialog({
                                 <IconHome className="size-4" />
                                 <span>Notes (root)</span>
                                 {isCurrentRoot && (
-                                    <span className="text-muted-foreground ml-auto text-xs">(current)</span>
+                                    <span className="text-muted-foreground ml-auto text-xs">
+                                        (current)
+                                    </span>
                                 )}
                             </button>
 

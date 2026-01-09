@@ -60,9 +60,7 @@ export default async function NotesPathPage({ params }: NotesPathPageProps) {
         return (
             <div className="flex h-full flex-col">
                 <div className="relative flex h-14 items-center border-b px-4">
-                    <h1 className="text-lg font-semibold">
-                        {folder?.name ?? "Notes"}
-                    </h1>
+                    <h1 className="text-lg font-semibold">{folder?.name ?? "Notes"}</h1>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6">

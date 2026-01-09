@@ -24,11 +24,7 @@ import { SortableFolderCard } from "./sortable-folder-card";
 import { SortableNoteCard } from "./sortable-note-card";
 import { FolderFormDialog } from "./folder-form-dialog";
 import { GenericNoteEditorDialog } from "./generic-note-editor-dialog";
-import {
-    reorderFolderItems,
-    moveFolder,
-    moveGenericNote
-} from "@/app/notebook/notes/actions";
+import { reorderFolderItems, moveFolder, moveGenericNote } from "@/app/notebook/notes/actions";
 import type { Note, NoteFolder, Project } from "@/db/schema";
 
 interface FolderBrowserProps {
@@ -130,11 +126,7 @@ export function FolderBrowser({
                         }
                     } catch (error) {
                         console.error("Failed to move item:", error);
-                        alert(
-                            error instanceof Error
-                                ? error.message
-                                : "Failed to move item"
-                        );
+                        alert(error instanceof Error ? error.message : "Failed to move item");
                     }
                 });
                 return;
@@ -263,7 +255,7 @@ export function FolderBrowser({
                         {/* Folders */}
                         {optimisticFolders.length > 0 && (
                             <div className="space-y-3">
-                                <h2 className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                                <h2 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                                     Folders
                                 </h2>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -284,7 +276,7 @@ export function FolderBrowser({
                         {/* Notes */}
                         {optimisticNotes.length > 0 && (
                             <div className="space-y-3">
-                                <h2 className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                                <h2 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                                     Notes
                                 </h2>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">

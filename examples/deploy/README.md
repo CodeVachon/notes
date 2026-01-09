@@ -71,8 +71,8 @@ For production, you should enable HTTPS:
 1. Obtain SSL certificates (e.g., via Let's Encrypt)
 
 2. Place certificates in an `ssl/` directory:
-   - `ssl/fullchain.pem`
-   - `ssl/privkey.pem`
+    - `ssl/fullchain.pem`
+    - `ssl/privkey.pem`
 
 3. Uncomment the HTTPS sections in both `nginx.conf` and `docker-compose.production.yml`
 

@@ -46,7 +46,7 @@ export function CopyTodoDialog({ todoId, todoTitle, onCopy }: CopyTodoDialogProp
             <DialogTrigger
                 render={
                     <button
-                        className="flex w-full cursor-default items-center gap-2 px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground"
+                        className="hover:bg-accent hover:text-accent-foreground flex w-full cursor-default items-center gap-2 px-2 py-1.5 text-sm outline-none select-none"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <IconCopy className="size-3.5" />

@@ -60,9 +60,7 @@ export function SettingsDrawer({ open, onOpenChange }: SettingsDrawerProps) {
                     <div className="flex items-center justify-between">
                         <div>
                             <DrawerTitle>Settings</DrawerTitle>
-                            <DrawerDescription>
-                                Customize your app experience
-                            </DrawerDescription>
+                            <DrawerDescription>Customize your app experience</DrawerDescription>
                         </div>
                         <DrawerClose asChild>
                             <Button variant="ghost" size="icon-xs">
@@ -91,7 +89,7 @@ export function SettingsDrawer({ open, onOpenChange }: SettingsDrawerProps) {
                                         handleTimeFormatChange(e.target.value as TimeFormat)
                                     }
                                     disabled={isPending}
-                                    className="border-input bg-input/30 focus:border-ring focus:ring-ring/30 h-8 w-full rounded-md border px-2 text-xs outline-none focus:ring-2 [&>option]:bg-popover [&>option]:text-popover-foreground"
+                                    className="border-input bg-input/30 focus:border-ring focus:ring-ring/30 [&>option]:bg-popover [&>option]:text-popover-foreground h-8 w-full rounded-md border px-2 text-xs outline-none focus:ring-2"
                                 >
                                     <option value="12h">12-hour (2:30 PM)</option>
                                     <option value="24h">24-hour (14:30)</option>

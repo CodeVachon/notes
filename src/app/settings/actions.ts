@@ -67,9 +67,7 @@ export async function updateTimeFormat(timeFormat: TimeFormat) {
 }
 
 // Update primary color
-export async function updatePrimaryColor(
-    color: { l: string; c: string; h: string } | null
-) {
+export async function updatePrimaryColor(color: { l: string; c: string; h: string } | null) {
     const user = await getUser();
 
     // Ensure settings exist

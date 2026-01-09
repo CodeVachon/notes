@@ -32,11 +32,7 @@ export function FolderCard({ folder, basePath, onEdit, itemCount = 0 }: FolderCa
             } catch (error) {
                 // Show error in console for now - could add toast later
                 console.error("Failed to delete folder:", error);
-                alert(
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to delete folder"
-                );
+                alert(error instanceof Error ? error.message : "Failed to delete folder");
             }
         });
     };

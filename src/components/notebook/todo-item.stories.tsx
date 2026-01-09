@@ -86,7 +86,8 @@ export const WithDescription: Story = {
         todo: {
             ...mockTodo,
             title: "Review pull request",
-            description: "<p>Check the <strong>API changes</strong> and ensure backwards compatibility.</p>"
+            description:
+                "<p>Check the <strong>API changes</strong> and ensure backwards compatibility.</p>"
         }
     }
 };

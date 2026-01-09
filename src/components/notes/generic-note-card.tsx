@@ -48,9 +48,7 @@ export function GenericNoteCard({ note, basePath, projects = [] }: GenericNoteCa
     const notePath = basePath ? `${basePath}/${note.slug}` : note.slug;
 
     // Strip HTML and truncate for preview
-    const contentPreview = note.content
-        ? note.content.replace(/<[^>]*>/g, "").slice(0, 150)
-        : "";
+    const contentPreview = note.content ? note.content.replace(/<[^>]*>/g, "").slice(0, 150) : "";
 
     return (
         <Card

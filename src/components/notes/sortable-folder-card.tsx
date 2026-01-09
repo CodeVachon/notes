@@ -73,7 +73,7 @@ export function SortableFolderCard({
                 className={cn(
                     "group hover:ring-primary/20 transition-all hover:ring-2",
                     isPending && "pointer-events-none opacity-50",
-                    isDragging && "opacity-50 ring-2 ring-primary"
+                    isDragging && "ring-primary opacity-50 ring-2"
                 )}
             >
                 <Link href={`/notebook/notes/${folderPath}`} className="block">
@@ -106,7 +106,10 @@ export function SortableFolderCard({
                                 >
                                     <IconDotsVertical className="size-3.5" />
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenuContent
+                                    align="end"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <DropdownMenuItem
                                         onClick={(e) => {
                                             e.preventDefault();
