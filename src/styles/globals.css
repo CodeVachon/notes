@@ -282,3 +282,83 @@ blockquote {
 .dark * {
     scrollbar-color: var(--primary) black;
 }
+
+/* Landing page animations */
+@keyframes landing-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes landing-float {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(20px, -30px) scale(1.05);
+    }
+    50% {
+        transform: translate(-10px, 20px) scale(0.95);
+    }
+    75% {
+        transform: translate(-30px, -10px) scale(1.02);
+    }
+}
+
+@keyframes landing-pulse {
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+}
+
+.animate-landing-fade-in {
+    animation: landing-fade-in 0.8s ease-out forwards;
+}
+
+.animate-landing-fade-in-delay-1 {
+    animation: landing-fade-in 0.8s ease-out 0.1s forwards;
+}
+
+.animate-landing-fade-in-delay-2 {
+    animation: landing-fade-in 0.8s ease-out 0.2s forwards;
+}
+
+.animate-landing-fade-in-delay-3 {
+    animation: landing-fade-in 0.8s ease-out 0.3s forwards;
+}
+
+.animate-landing-fade-in-delay-4 {
+    animation: landing-fade-in 0.8s ease-out 0.4s forwards;
+}
+
+.animate-landing-fade-in-delay-5 {
+    animation: landing-fade-in 0.8s ease-out 0.5s forwards;
+}
+
+.animate-landing-float {
+    animation: landing-float 20s ease-in-out infinite;
+}
+
+.animate-landing-float-reverse {
+    animation: landing-float 25s ease-in-out infinite reverse;
+}
+
+.animate-landing-float-delayed {
+    animation: landing-float 18s ease-in-out 5s infinite;
+}
+
+.animate-landing-pulse {
+    animation: landing-pulse 4s ease-in-out infinite;
+}
