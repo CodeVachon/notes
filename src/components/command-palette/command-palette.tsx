@@ -10,7 +10,8 @@ import {
     IconCalendarSearch,
     IconCheckbox,
     IconNote,
-    IconArrowLeft
+    IconArrowLeft,
+    IconSearch
 } from "@tabler/icons-react";
 
 import {
@@ -29,8 +30,11 @@ import { useMounted } from "@/lib/use-mounted";
 import { getTodayString, getYesterdayString, getTomorrowString } from "@/lib/date-utils";
 import { parseDateInput } from "@/lib/date-parser";
 import { createTodo, createNote } from "@/app/notebook/actions";
+import { search, type SearchResult } from "@/app/search/actions";
+import { SearchResults } from "@/components/search";
+import { useDebounce } from "@/lib/use-debounce";
 
-type PaletteMode = "commands" | "date-input" | "todo-input" | "note-input";
+type PaletteMode = "commands" | "date-input" | "todo-input" | "note-input" | "search";
 
 interface CommandPaletteContentProps {
     currentDate: string;
@@ -47,6 +51,12 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
     const [inputValue, setInputValue] = useState("");
     const [error, setError] = useState<string | null>(null);
 
+    // Search state
+    const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const debouncedQuery = useDebounce(inputValue, 300);
+
     // Handle refocus after successful multi-submit when transition completes
     useEffect(() => {
         if (!isPending && shouldRefocusRef.current) {
@@ -55,10 +65,37 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
         }
     }, [isPending]);
 
+    // Handle search when in search mode
+    useEffect(() => {
+        if (mode !== "search") return;
+
+        if (!debouncedQuery.trim() || debouncedQuery.length < 2) {
+            setSearchResults([]);
+            setIsSearching(false);
+            setSelectedIndex(-1);
+            return;
+        }
+
+        setIsSearching(true);
+        search(debouncedQuery)
+            .then((results) => {
+                setSearchResults(results);
+                setSelectedIndex(results.length > 0 ? 0 : -1);
+            })
+            .catch(() => {
+                setSearchResults([]);
+            })
+            .finally(() => {
+                setIsSearching(false);
+            });
+    }, [debouncedQuery, mode]);
+
     const goBack = useCallback(() => {
         setMode("commands");
         setInputValue("");
         setError(null);
+        setSearchResults([]);
+        setSelectedIndex(-1);
     }, []);
 
     // Handle navigation commands
@@ -144,6 +181,66 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
         [inputValue, currentDate, onClose]
     );
 
+    // Handle search result navigation
+    const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Escape") {
+            e.preventDefault();
+            goBack();
+        } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setSelectedIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : prev));
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        } else if (e.key === "Enter" && selectedIndex >= 0 && searchResults[selectedIndex]) {
+            e.preventDefault();
+            const result = searchResults[selectedIndex];
+            if (result.date) {
+                router.push(`/notebook/${result.date}?highlight=${result.type}-${result.id}`);
+            }
+            onClose();
+        }
+    };
+
+    // Render search mode
+    if (mode === "search") {
+        return (
+            <Command className="rounded-xl">
+                <div className="flex items-center gap-2 border-b p-3">
+                    <button
+                        onClick={goBack}
+                        className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
+                    >
+                        <IconArrowLeft className="size-4" />
+                    </button>
+                    <span className="text-sm font-medium">Search</span>
+                </div>
+                <div className="p-3 pb-0">
+                    <Input
+                        ref={inputRef}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleSearchKeyDown}
+                        placeholder="Search notes and todos..."
+                        autoFocus
+                    />
+                </div>
+                <SearchResults
+                    results={searchResults}
+                    isLoading={isSearching}
+                    query={inputValue}
+                    selectedIndex={selectedIndex}
+                    onResultSelect={onClose}
+                />
+                {inputValue.length < 2 && inputValue.length > 0 && (
+                    <p className="text-muted-foreground px-3 pb-3 text-xs">
+                        Type at least 2 characters to search
+                    </p>
+                )}
+            </Command>
+        );
+    }
+
     // Render secondary input mode
     if (mode !== "commands") {
         const config = {
@@ -222,6 +319,13 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
             <CommandInput placeholder="Type a command or search..." />
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup heading="Search">
+                    <CommandItem value="search find notes todos" onSelect={() => setMode("search")}>
+                        <IconSearch className="text-muted-foreground" />
+                        <span>Search...</span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
                 <CommandGroup heading="Create">
                     <CommandItem value="add todo task" onSelect={() => setMode("todo-input")}>
                         <IconCheckbox className="text-muted-foreground" />

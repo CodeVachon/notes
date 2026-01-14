@@ -85,7 +85,7 @@ export default function Page() {
             {/* Floating orbs */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div className="bg-primary/20 animate-landing-float absolute -top-20 left-1/4 size-64 rounded-full blur-3xl" />
-                <div className="bg-primary/10 animate-landing-float-reverse absolute -bottom-32 right-1/4 size-96 rounded-full blur-3xl" />
+                <div className="bg-primary/10 animate-landing-float-reverse absolute right-1/4 -bottom-32 size-96 rounded-full blur-3xl" />
                 <div className="bg-primary/15 animate-landing-float-delayed absolute top-1/2 -right-20 size-48 rounded-full blur-3xl" />
             </div>
 
@@ -93,7 +93,7 @@ export default function Page() {
             <div className="animate-landing-fade-in relative z-10 flex max-w-3xl flex-col items-center gap-8 text-center">
                 {/* Logo/Title with glow effect */}
                 <div className="relative">
-                    <h1 className="bg-gradient-to-b from-foreground via-foreground to-foreground/60 bg-clip-text text-6xl font-bold tracking-tighter text-transparent sm:text-7xl">
+                    <h1 className="from-foreground via-foreground to-foreground/60 bg-gradient-to-b bg-clip-text text-6xl font-bold tracking-tighter text-transparent sm:text-7xl">
                         Notes
                     </h1>
                     <div className="bg-primary/30 animate-landing-pulse absolute inset-0 -z-10 blur-2xl" />
@@ -101,9 +101,9 @@ export default function Page() {
 
                 {/* Subtitle */}
                 <p className="text-muted-foreground animate-landing-fade-in-delay-1 max-w-xl text-lg leading-relaxed">
-                    A personal note-taking and task management application. Features a daily notebook
-                    system with rich-text editing, todos with priorities, automatic tag extraction,
-                    and project organization.
+                    A personal note-taking and task management application. Features a daily
+                    notebook system with rich-text editing, todos with priorities, automatic tag
+                    extraction, and project organization.
                 </p>
 
                 {/* CTA buttons with hover effects */}
@@ -112,7 +112,7 @@ export default function Page() {
                         href="/sign-in"
                         className={cn(
                             buttonVariants({ size: "lg" }),
-                            "group relative h-10 overflow-hidden px-6 text-sm shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25"
+                            "group hover:shadow-primary/25 relative h-10 overflow-hidden px-6 text-sm shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
                         )}
                     >
                         <span className="relative z-10">Sign In</span>
@@ -138,7 +138,7 @@ export default function Page() {
                 {features.map((feature) => (
                     <Card
                         key={feature.title}
-                        className="group relative backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"
+                        className="group hover:shadow-primary/10 relative backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                         {/* Card glow on hover */}
                         <div className="bg-primary/5 pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -147,7 +147,7 @@ export default function Page() {
 
                         <CardHeader className="relative pb-2">
                             <CardTitle className="flex items-center gap-2 text-sm">
-                                <div className="bg-primary/10 rounded-md p-1.5 transition-colors duration-300 group-hover:bg-primary/20">
+                                <div className="bg-primary/10 group-hover:bg-primary/20 rounded-md p-1.5 transition-colors duration-300">
                                     <feature.icon className="text-primary size-4 transition-transform duration-300 group-hover:scale-110" />
                                 </div>
                                 {feature.title}
