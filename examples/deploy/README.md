@@ -6,6 +6,7 @@ This directory contains example configuration files for deploying the Notes appl
 
 - `docker-compose.production.yml` - Production Docker Compose configuration
 - `nginx.conf` - Nginx reverse proxy configuration with SSE support
+- `init-db.sql` - PostgreSQL initialization script (enables required extensions)
 
 ## Server-Sent Events (SSE) Configuration
 
@@ -108,3 +109,21 @@ Run migrations manually:
 ```bash
 docker compose -f docker-compose.production.yml exec app bun run db:migrate
 ```
+
+### Search not returning results
+
+The search feature requires the `pg_trgm` PostgreSQL extension. This is installed automatically on fresh deployments via `init-db.sql`, but for existing databases you need to enable it manually:
+
+```bash
+# Check if extension is installed
+docker exec -it notes-postgres psql -U notes_user -d notes_db -c "SELECT extname FROM pg_extension WHERE extname = 'pg_trgm';"
+
+# Install if missing
+docker exec -it notes-postgres psql -U notes_user -d notes_db -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+
+# Verify it works
+docker exec -it notes-postgres psql -U notes_user -d notes_db -c "SELECT similarity('test', 'tset');"
+# Should return approximately 0.5
+```
+
+> **Note:** The `init-db.sql` script only runs when PostgreSQL initializes a new database (empty data volume). For existing databases, the extension must be enabled manually once.

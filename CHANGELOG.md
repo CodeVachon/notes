@@ -2,6 +2,65 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-01-14
+
+### New Features
+
+**Keyboard Shortcuts**
+
+- `Cmd/Ctrl+K` - Open command palette
+- `T` - Quick add new todo (when not in an input field)
+- `N` - Quick add new note (when not in an input field)
+- `,` - Open settings (when not in an input field)
+- `Cmd/Ctrl+/` - View all keyboard shortcuts
+- New "Settings" command in the command palette
+- New "Keyboard Shortcuts" command in the command palette Help section
+
+**Soft Delete Support**
+
+- Todos and notes now support soft deletion via `deletedAt` column
+- Enables future data recovery features
+
+### Improvements
+
+**Performance Optimizations**
+
+- Folder path traversal now uses recursive CTEs (single query instead of N queries)
+- Breadcrumb generation optimized with recursive CTE
+- Descendant checking for folder moves optimized with recursive CTE
+
+**Code Quality**
+
+- Extracted `stripHtml()` and `isEmptyHtml()` utilities to `src/lib/utils.ts`
+- Added `isValidTimeString()` validation function to `src/lib/date-utils.ts`
+- New `useDialog` hook for consistent dialog state management
+- Removed duplicate code across components
+
+**Database Integrity**
+
+- Added foreign key indexes for faster JOIN operations on `comment`, `project_assignment`, and `tag_mention` tables
+- Added composite indexes for common query patterns (`user_id + date`)
+- Added constraint ensuring comments have exactly one parent (todo OR note)
+- Added date format validation constraints at database level
+- Added real-time sync triggers for `note_folder`, `tag`, and `tag_mention` tables
+
+### Database Changes
+
+**New Migrations:**
+
+- `0006_complete_mattie_franklin.sql` - Drizzle-generated migration adding `deleted_at` columns
+- `0007_add_indexes_and_constraints.sql` - 11 indexes + data integrity constraints
+- `0008_add_missing_triggers.sql` - Real-time sync triggers for additional tables
+- `0009_add_soft_delete.sql` - Partial indexes for soft delete filtering
+
+> **Note:** Run `bun run db:push` for development or `bun run db:migrate` for production to apply schema changes. Then run the custom SQL migrations:
+>
+> ```bash
+> psql $DATABASE_URL -f src/db/migrations/0007_add_indexes_and_constraints.sql
+> psql $DATABASE_URL -f src/db/migrations/0008_add_missing_triggers.sql
+> psql $DATABASE_URL -f src/db/migrations/0009_add_soft_delete.sql
+> ```
+
 ## [0.4.0] - 2026-01-14
 
 ### New Features

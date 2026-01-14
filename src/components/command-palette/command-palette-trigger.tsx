@@ -19,7 +19,7 @@ export function CommandPaletteTrigger() {
 
     return (
         <button
-            onClick={openPalette}
+            onClick={() => openPalette()}
             className="hover:bg-accent flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
         >
             <IconCommand className="text-muted-foreground size-4" />

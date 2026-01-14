@@ -16,7 +16,7 @@ import {
 import { RichTextEditor } from "./rich-text-editor";
 import { HtmlContent } from "./html-content";
 import { createComment, updateComment, deleteComment } from "@/app/notebook/actions";
-import { cn } from "@/lib/utils";
+import { cn, isEmptyHtml } from "@/lib/utils";
 import type { Comment } from "@/db/schema";
 
 interface CommentSectionProps {
@@ -44,14 +44,9 @@ function CommentForm({
     const [content, setContent] = useState(comment?.content ?? "");
     const isEditing = !!comment;
 
-    const isEmptyContent = (html: string) => {
-        const stripped = html.replace(/<[^>]*>/g, "").trim();
-        return stripped === "";
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (isEmptyContent(content)) return;
+        if (isEmptyHtml(content)) return;
 
         startTransition(async () => {
             if (isEditing && comment) {
@@ -90,7 +85,7 @@ function CommentForm({
             />
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <Button type="submit" disabled={isPending || isEmptyContent(content)}>
+                <Button type="submit" disabled={isPending || isEmptyHtml(content)}>
                     {isPending ? "Saving..." : isEditing ? "Save Changes" : "Add Comment"}
                 </Button>
             </AlertDialogFooter>

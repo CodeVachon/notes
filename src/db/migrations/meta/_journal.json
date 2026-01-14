@@ -43,6 +43,13 @@
       "when": 1767891456977,
       "tag": "0005_past_iron_monger",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1768419400833,
+      "tag": "0006_complete_mattie_franklin",
+      "breakpoints": true
     }
   ]
 }

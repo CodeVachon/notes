@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq, and, isNull, asc, count } from "drizzle-orm";
+import { eq, and, isNull, asc, count, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { note, noteFolder, type Note, type NoteFolder } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -272,21 +272,26 @@ async function checkIsDescendant(
     folderId: string,
     ancestorId: string
 ): Promise<boolean> {
-    let currentId: string | null = folderId;
+    // Use recursive CTE to check ancestry in a single query
+    const result = await db.execute<{ is_descendant: boolean }>(sql`
+        WITH RECURSIVE ancestors AS (
+            -- Start with the folder we're checking
+            SELECT id, parent_id FROM note_folder
+            WHERE id = ${folderId} AND user_id = ${userId}
+            UNION ALL
+            -- Recursively get all ancestors
+            SELECT nf.id, nf.parent_id FROM note_folder nf
+            JOIN ancestors a ON nf.id = a.parent_id
+            WHERE nf.user_id = ${userId}
+        )
+        SELECT EXISTS(
+            SELECT 1 FROM ancestors WHERE id = ${ancestorId}
+        ) as is_descendant
+    `);
 
-    while (currentId) {
-        if (currentId === ancestorId) return true;
-
-        const parent = await db
-            .select({ parentId: noteFolder.parentId })
-            .from(noteFolder)
-            .where(and(eq(noteFolder.id, currentId), eq(noteFolder.userId, userId)))
-            .limit(1);
-
-        currentId = parent[0]?.parentId ?? null;
-    }
-
-    return false;
+    // db.execute returns rows directly as an array
+    const rows = result as unknown as Array<{ is_descendant: boolean }>;
+    return rows[0]?.is_descendant ?? false;
 }
 
 export async function getFolderByPath(pathSegments: string[]): Promise<NoteFolder | null> {
@@ -368,28 +373,35 @@ export async function getFolderBreadcrumbs(
     if (!folderId) return [];
 
     const user = await getUser();
-    const breadcrumbs: Array<{ id: string; name: string; slug: string }> = [];
-    let currentId: string | null = folderId;
 
-    while (currentId) {
-        const folder = await db
-            .select()
-            .from(noteFolder)
-            .where(and(eq(noteFolder.id, currentId), eq(noteFolder.userId, user.id)))
-            .limit(1);
+    // Use recursive CTE to get all ancestors in a single query
+    const result = await db.execute<{ id: string; name: string; slug: string; depth: number }>(sql`
+        WITH RECURSIVE breadcrumbs AS (
+            -- Start with the target folder
+            SELECT id, name, slug, parent_id, 0 as depth FROM note_folder
+            WHERE id = ${folderId} AND user_id = ${user.id}
+            UNION ALL
+            -- Recursively get all ancestors
+            SELECT nf.id, nf.name, nf.slug, nf.parent_id, b.depth + 1 FROM note_folder nf
+            JOIN breadcrumbs b ON nf.id = b.parent_id
+            WHERE nf.user_id = ${user.id}
+        )
+        SELECT id, name, slug, depth FROM breadcrumbs
+        ORDER BY depth DESC
+    `);
 
-        if (!folder[0]) break;
-
-        breadcrumbs.unshift({
-            id: folder[0].id,
-            name: folder[0].name,
-            slug: folder[0].slug
-        });
-
-        currentId = folder[0].parentId;
-    }
-
-    return breadcrumbs;
+    // db.execute returns rows directly as an array
+    const rows = result as unknown as Array<{
+        id: string;
+        name: string;
+        slug: string;
+        depth: number;
+    }>;
+    return rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        slug: row.slug
+    }));
 }
 
 // ============ Generic Note Actions ============

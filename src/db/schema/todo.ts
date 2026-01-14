@@ -18,7 +18,8 @@ export const todo = pgTable("todo", {
     completedAt: timestamp("completed_at"),
     sourceId: text("source_id").references((): AnyPgColumn => todo.id, { onDelete: "set null" }), // Reference to original todo if copied
     createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow()
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at") // Soft delete - null means not deleted
 });
 
 export type Todo = typeof todo.$inferSelect;

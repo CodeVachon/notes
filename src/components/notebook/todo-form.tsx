@@ -25,6 +25,7 @@ import {
     AlertDialogCancel
 } from "@/components/ui/alert-dialog";
 import { createTodo, updateTodo } from "@/app/notebook/actions";
+import { isEmptyHtml } from "@/lib/utils";
 import type { Todo, TodoPriority, Project } from "@/db/schema";
 
 interface TodoFormProps {
@@ -54,12 +55,6 @@ export function TodoForm({
     const [projectIds, setProjectIds] = useState<string[]>(initialProjectIds);
 
     const isEditing = !!todo;
-
-    // Check if HTML content is effectively empty
-    const isEmptyHtml = (html: string) => {
-        const stripped = html.replace(/<[^>]*>/g, "").trim();
-        return !stripped;
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

@@ -11,7 +11,9 @@ import {
     IconCheckbox,
     IconNote,
     IconArrowLeft,
-    IconSearch
+    IconSearch,
+    IconKeyboard,
+    IconSettings
 } from "@tabler/icons-react";
 
 import {
@@ -26,6 +28,7 @@ import {
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { useCommandPalette } from "./command-palette-provider";
+import { useSettingsDrawer } from "@/components/settings/settings-drawer-provider";
 import { useMounted } from "@/lib/use-mounted";
 import { getTodayString, getYesterdayString, getTomorrowString } from "@/lib/date-utils";
 import { parseDateInput } from "@/lib/date-parser";
@@ -34,20 +37,27 @@ import { search, type SearchResult } from "@/app/search/actions";
 import { SearchResults } from "@/components/search";
 import { useDebounce } from "@/lib/use-debounce";
 
-type PaletteMode = "commands" | "date-input" | "todo-input" | "note-input" | "search";
+type PaletteMode = "commands" | "date-input" | "todo-input" | "note-input" | "search" | "shortcuts";
 
 interface CommandPaletteContentProps {
     currentDate: string;
+    initialMode: PaletteMode;
     onClose: () => void;
+    onOpenSettings: () => void;
 }
 
-function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentProps) {
+function CommandPaletteContent({
+    currentDate,
+    initialMode,
+    onClose,
+    onOpenSettings
+}: CommandPaletteContentProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const inputRef = useRef<HTMLInputElement>(null);
     const shouldRefocusRef = useRef(false);
 
-    const [mode, setMode] = useState<PaletteMode>("commands");
+    const [mode, setMode] = useState<PaletteMode>(initialMode);
     const [inputValue, setInputValue] = useState("");
     const [error, setError] = useState<string | null>(null);
 
@@ -113,6 +123,11 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
         router.push(`/notebook/${getYesterdayString()}`);
         onClose();
     }, [router, onClose]);
+
+    const handleOpenSettings = useCallback(() => {
+        onClose();
+        onOpenSettings();
+    }, [onClose, onOpenSettings]);
 
     // Handle date input submission
     const handleDateSubmit = useCallback(
@@ -241,6 +256,49 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
         );
     }
 
+    // Render shortcuts mode
+    if (mode === "shortcuts") {
+        const isMac = typeof navigator !== "undefined" && navigator.platform.includes("Mac");
+        const modKey = isMac ? "⌘" : "Ctrl";
+
+        const shortcuts = [
+            { keys: `${modKey}+K`, description: "Open command palette" },
+            { keys: "T", description: "Quick add new todo" },
+            { keys: "N", description: "Quick add new note" },
+            { keys: ",", description: "Open settings" },
+            { keys: `${modKey}+/`, description: "Show keyboard shortcuts" }
+        ];
+
+        return (
+            <Command className="rounded-xl">
+                <div className="flex items-center gap-2 border-b p-3">
+                    <button
+                        onClick={goBack}
+                        className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
+                    >
+                        <IconArrowLeft className="size-4" />
+                    </button>
+                    <span className="text-sm font-medium">Keyboard Shortcuts</span>
+                </div>
+                <div className="p-3">
+                    <div className="space-y-2">
+                        {shortcuts.map(({ keys, description }) => (
+                            <div key={keys} className="flex items-center justify-between py-1">
+                                <span className="text-muted-foreground text-sm">{description}</span>
+                                <kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">
+                                    {keys}
+                                </kbd>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-muted-foreground mt-4 text-xs">
+                        Press Escape or click the back arrow to return
+                    </p>
+                </div>
+            </Command>
+        );
+    }
+
     // Render secondary input mode
     if (mode !== "commands") {
         const config = {
@@ -358,6 +416,23 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
                         <span>Jump to Date...</span>
                     </CommandItem>
                 </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Settings">
+                    <CommandItem value="settings preferences config" onSelect={handleOpenSettings}>
+                        <IconSettings className="text-muted-foreground" />
+                        <span>Settings</span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Help">
+                    <CommandItem
+                        value="keyboard shortcuts hotkeys help"
+                        onSelect={() => setMode("shortcuts")}
+                    >
+                        <IconKeyboard className="text-muted-foreground" />
+                        <span>Keyboard Shortcuts</span>
+                    </CommandItem>
+                </CommandGroup>
             </CommandList>
         </Command>
     );
@@ -365,7 +440,8 @@ function CommandPaletteContent({ currentDate, onClose }: CommandPaletteContentPr
 
 export function CommandPalette() {
     const pathname = usePathname();
-    const { isOpen, closePalette } = useCommandPalette();
+    const { isOpen, initialMode, closePalette } = useCommandPalette();
+    const { openSettings } = useSettingsDrawer();
     const mounted = useMounted();
 
     // Extract current date from URL
@@ -388,7 +464,14 @@ export function CommandPalette() {
     // Only render content when open - this ensures fresh state on each open
     return (
         <CommandDialog open={isOpen} onOpenChange={handleOpenChange}>
-            {isOpen && <CommandPaletteContent currentDate={currentDate} onClose={closePalette} />}
+            {isOpen && (
+                <CommandPaletteContent
+                    currentDate={currentDate}
+                    initialMode={initialMode}
+                    onClose={closePalette}
+                    onOpenSettings={openSettings}
+                />
+            )}
         </CommandDialog>
     );
 }

@@ -38,7 +38,12 @@ function getDefaultDate(currentPageDate: string): Date {
     return today;
 }
 
-export function CopyTodoDialog({ todoId, todoTitle, currentPageDate, onCopy }: CopyTodoDialogProps) {
+export function CopyTodoDialog({
+    todoId,
+    todoTitle,
+    currentPageDate,
+    onCopy
+}: CopyTodoDialogProps) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);

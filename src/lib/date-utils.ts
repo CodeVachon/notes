@@ -60,6 +60,13 @@ export function isValidDateString(dateString: string): boolean {
 }
 
 /**
+ * Check if a time string is valid HH:mm format (24-hour)
+ */
+export function isValidTimeString(time: string): boolean {
+    return /^([01]\d|2[0-3]):[0-5]\d$/.test(time);
+}
+
+/**
  * Format time for display based on user preference
  * @param time - Time string in HH:mm format
  * @param timeFormat - "12h" for 12-hour (2:30 PM) or "24h" for 24-hour (14:30)

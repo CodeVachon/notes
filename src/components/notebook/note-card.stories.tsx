@@ -12,7 +12,8 @@ const mockNote: Note = {
     content: "<p>Discussed project timeline and deliverables.</p>",
     sortOrder: 0,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    deletedAt: null
 };
 
 const mockComments: Comment[] = [];

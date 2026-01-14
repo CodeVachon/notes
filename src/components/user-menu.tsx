@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { IconLogout, IconChevronUp, IconSettings } from "@tabler/icons-react";
@@ -14,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { SettingsDrawer } from "@/components/settings/settings-drawer";
+import { useSettingsDrawer } from "@/components/settings/settings-drawer-provider";
 
 interface UserMenuProps {
     user: {
@@ -27,15 +26,11 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
     const router = useRouter();
     const mounted = useMounted();
-    const [settingsOpen, setSettingsOpen] = useState(false);
+    const { openSettings } = useSettingsDrawer();
 
     const handleSignOut = async () => {
         await signOut();
         router.push("/sign-in");
-    };
-
-    const handleOpenSettings = () => {
-        setSettingsOpen(true);
     };
 
     // Render placeholder during SSR to avoid hydration mismatch
@@ -81,7 +76,7 @@ export function UserMenu({ user }: UserMenuProps) {
                     <IconChevronUp className="text-muted-foreground size-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-56">
-                    <DropdownMenuItem onClick={handleOpenSettings}>
+                    <DropdownMenuItem onClick={openSettings}>
                         <IconSettings />
                         Settings
                     </DropdownMenuItem>
@@ -92,8 +87,6 @@ export function UserMenu({ user }: UserMenuProps) {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-
-            <SettingsDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
         </>
     );
 }

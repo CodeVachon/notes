@@ -9,8 +9,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-notes_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Mount the migration that creates notify triggers
-      - ../../src/db/migrations/0005_add_notify_triggers.sql:/docker-entrypoint-initdb.d/notify_triggers.sql:ro
+      # Database initialization scripts (run on first startup only)
+      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
+      - ../../src/db/migrations/0005_add_notify_triggers.sql:/docker-entrypoint-initdb.d/02-notify_triggers.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-notes_user} -d ${POSTGRES_DB:-notes_db}"]
       interval: 10s

@@ -26,13 +26,14 @@ const mockTodo: Todo = {
     completedAt: null,
     sourceId: null,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    deletedAt: null
 };
 
 const mockComments: Comment[] = [];
 
 const mockProjects: Pick<Project, "id" | "name" | "color" | "emoji">[] = [
-    { id: "proj-1", name: "Work", color: "#3b82f6", emoji: "💼" }
+    { id: "proj-1", name: "Work", color: "blue", emoji: "💼" }
 ];
 
 const meta: Meta<typeof TodoItem> = {
@@ -109,8 +110,8 @@ export const WithMultipleProjects: Story = {
     args: {
         todo: mockTodo,
         projects: [
-            { id: "proj-1", name: "Work", color: "#3b82f6", emoji: "💼" },
-            { id: "proj-2", name: "Personal", color: "#22c55e", emoji: "🏠" }
+            { id: "proj-1", name: "Work", color: "blue", emoji: "💼" },
+            { id: "proj-2", name: "Personal", color: "green", emoji: "🏠" }
         ]
     }
 };

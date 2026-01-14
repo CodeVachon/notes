@@ -110,10 +110,10 @@ export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: 
 
                     <div className="flex shrink-0 items-center gap-2">
                         <PrioritySelector
-                                            todoId={todo.id}
-                                            priority={optimisticTodo.priority}
-                                            onPriorityChange={handlePriorityChange}
-                                        />
+                            todoId={todo.id}
+                            priority={optimisticTodo.priority}
+                            onPriorityChange={handlePriorityChange}
+                        />
                         {formattedTime && (
                             <span className="text-muted-foreground text-xs">{formattedTime}</span>
                         )}
@@ -136,10 +136,10 @@ export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: 
                                     Edit
                                 </DropdownMenuItem>
                                 <CopyTodoDialog
-                                                    todoId={todo.id}
-                                                    todoTitle={todo.title}
-                                                    currentPageDate={todo.date}
-                                                />
+                                    todoId={todo.id}
+                                    todoTitle={todo.title}
+                                    currentPageDate={todo.date}
+                                />
                                 <DropdownMenuItem onClick={handleDelete} variant="destructive">
                                     <IconTrash className="size-3.5" />
                                     Delete

@@ -16,7 +16,8 @@ export const note = pgTable(
         content: text("content").notNull().default(""), // HTML from Tiptap
         sortOrder: integer("sort_order").notNull().default(0),
         createdAt: timestamp("created_at").notNull().defaultNow(),
-        updatedAt: timestamp("updated_at").notNull().defaultNow()
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+        deletedAt: timestamp("deleted_at") // Soft delete - null means not deleted
     },
     (table) => ({
         // Unique note slug within same folder for same user (for generic notes)
