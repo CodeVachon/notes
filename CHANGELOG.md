@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-01-14
+
+### New Features
+
+- **Basic Search** - Added search functionality to find content across notes and todos
+- **Clickable Priority Badge** - Click on a todo's priority to quickly change it without opening the edit dialog
+
+### Improvements
+
+- **Copy Todo Default Date** - Copy todo dialog now defaults to today (or tomorrow if already on today's page)
+- **Landing Page Update** - Refreshed front landing page design
+
+### Bug Fixes
+
+- Fixed drawer component issue
+
 ## [0.3.1] - 2026-01-09
 
 ### New Features
