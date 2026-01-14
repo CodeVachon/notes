@@ -11,7 +11,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
-import { PriorityBadge } from "./priority-badge";
+import { PrioritySelector } from "./priority-selector";
 import { ProjectBadge } from "./project-badge";
 import { HtmlContent } from "./html-content";
 import { CommentSection } from "./comment-section";
@@ -21,7 +21,7 @@ import { toggleTodo, deleteTodo } from "@/app/notebook/actions";
 import { formatTimeForDisplay } from "@/lib/date-utils";
 import { useSettings } from "@/lib/settings-context";
 import { cn } from "@/lib/utils";
-import type { Todo, Comment, Project } from "@/db/schema";
+import type { Todo, Comment, Project, TodoPriority } from "@/db/schema";
 
 interface TodoItemProps {
     todo: Todo;
@@ -47,6 +47,10 @@ export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: 
         startTransition(async () => {
             await deleteTodo(todo.id);
         });
+    };
+
+    const handlePriorityChange = (newPriority: TodoPriority) => {
+        setOptimisticTodo({ ...optimisticTodo, priority: newPriority });
     };
 
     const formattedTime = formatTimeForDisplay(optimisticTodo.dueTime, settings.timeFormat);
@@ -105,7 +109,11 @@ export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: 
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">
-                        <PriorityBadge priority={optimisticTodo.priority} />
+                        <PrioritySelector
+                                            todoId={todo.id}
+                                            priority={optimisticTodo.priority}
+                                            onPriorityChange={handlePriorityChange}
+                                        />
                         {formattedTime && (
                             <span className="text-muted-foreground text-xs">{formattedTime}</span>
                         )}
