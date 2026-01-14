@@ -127,7 +127,11 @@ export function TodoItem({ todo, comments, projects = [], sourceDate, onEdit }: 
                                     <IconPencil className="size-3.5" />
                                     Edit
                                 </DropdownMenuItem>
-                                <CopyTodoDialog todoId={todo.id} todoTitle={todo.title} />
+                                <CopyTodoDialog
+                                                    todoId={todo.id}
+                                                    todoTitle={todo.title}
+                                                    currentPageDate={todo.date}
+                                                />
                                 <DropdownMenuItem onClick={handleDelete} variant="destructive">
                                     <IconTrash className="size-3.5" />
                                     Delete

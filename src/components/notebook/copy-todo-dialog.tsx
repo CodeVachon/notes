@@ -19,14 +19,38 @@ import { formatDateForStorage, formatDateForDisplay } from "@/lib/date-utils";
 interface CopyTodoDialogProps {
     todoId: string;
     todoTitle: string;
+    currentPageDate: string; // The date of the page we're currently on (YYYY-MM-DD)
     onCopy?: () => void;
 }
 
-export function CopyTodoDialog({ todoId, todoTitle, onCopy }: CopyTodoDialogProps) {
+function getDefaultDate(currentPageDate: string): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = formatDateForStorage(today);
+
+    if (currentPageDate === todayStr) {
+        // On today's page, default to tomorrow
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow;
+    }
+    // On any other page, default to today
+    return today;
+}
+
+export function CopyTodoDialog({ todoId, todoTitle, currentPageDate, onCopy }: CopyTodoDialogProps) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [isPending, startTransition] = useTransition();
+
+    // Set default date when dialog opens
+    const handleOpenChange = (isOpen: boolean) => {
+        setOpen(isOpen);
+        if (isOpen && !selectedDate) {
+            setSelectedDate(getDefaultDate(currentPageDate));
+        }
+    };
 
     const handleCopy = async () => {
         if (!selectedDate) return;
@@ -42,7 +66,7 @@ export function CopyTodoDialog({ todoId, todoTitle, onCopy }: CopyTodoDialogProp
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger
                 render={
                     <button
