@@ -15,6 +15,12 @@ export const auth = betterAuth({
             ...schema
         }
     }),
+    emailAndPassword: {
+        enabled: true,
+        requireEmailVerification: false,
+        minPasswordLength: 8,
+        maxPasswordLength: 128
+    },
     socialProviders: {
         github: {
             clientId: process.env.GITHUB_CLIENT_ID!,
