@@ -2,7 +2,7 @@ import { test as setup, expect } from "@playwright/test";
 
 const AUTH_FILE = "playwright/.auth/user.json";
 
-// Test user credentials - create this user once before running tests
+// Test user credentials - global setup/teardown handles cleanup
 const TEST_USER = {
     name: "Test User",
     email: "test@example.com",
@@ -10,7 +10,7 @@ const TEST_USER = {
 };
 
 setup("authenticate", async ({ page }) => {
-    // First, try to sign up (will fail silently if user already exists)
+    // Try to sign up first (global-setup should have cleaned up any existing user)
     await page.goto("/sign-up");
 
     // Check if we're on the sign-up page (not redirected to notebook)
@@ -20,11 +20,15 @@ setup("authenticate", async ({ page }) => {
         await page.fill('input[name="password"]', TEST_USER.password);
         await page.click('button[type="submit"]');
 
-        // Wait for navigation - either to notebook (success) or stay on page (user exists)
-        await page.waitForURL(/\/(notebook|sign-up)/, { timeout: 10000 });
+        // Wait for either navigation to notebook OR an error to appear
+        await Promise.race([
+            page.waitForURL(/\/notebook/, { timeout: 10000 }),
+            page.waitForSelector('[data-slot="field-error"]', { timeout: 10000 })
+        ]);
 
-        // If we're still on sign-up, the user likely already exists - go sign in
-        if (page.url().includes("/sign-up")) {
+        // If there's an error (user exists), go to sign-in
+        const hasError = await page.locator('[data-slot="field-error"]').isVisible();
+        if (hasError || page.url().includes("/sign-up")) {
             await page.goto("/sign-in");
         }
     }

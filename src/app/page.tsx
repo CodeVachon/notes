@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { authConfig } from "@/lib/auth-config";
 
 const features = [
     {
@@ -108,16 +109,18 @@ export default function Page() {
 
                 {/* CTA buttons with hover effects */}
                 <div className="animate-landing-fade-in-delay-2 flex gap-4">
-                    <Link
-                        href="/sign-in"
-                        className={cn(
-                            buttonVariants({ size: "lg" }),
-                            "group hover:shadow-primary/25 relative h-10 overflow-hidden px-6 text-sm shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
-                        )}
-                    >
-                        <span className="relative z-10">Sign In</span>
-                        <div className="absolute inset-0 -z-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    </Link>
+                    {authConfig.signInEnabled && (
+                        <Link
+                            href="/sign-in"
+                            className={cn(
+                                buttonVariants({ size: "lg" }),
+                                "group hover:shadow-primary/25 relative h-10 overflow-hidden px-6 text-sm shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                            )}
+                        >
+                            <span className="relative z-10">Sign In</span>
+                            <div className="absolute inset-0 -z-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                        </Link>
+                    )}
                     <a
                         href="https://github.com/CodeVachon/notes"
                         target="_blank"

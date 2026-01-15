@@ -5,6 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
     testDir: "./tests",
+    // Note: Global setup/teardown removed due to ESM/CommonJS incompatibility
+    // Tests are designed to be idempotent and handle existing test data gracefully
     /* Run tests in files in parallel */
     fullyParallel: true,
     /* Fail the build on CI if you accidentally left test.only in the source code. */
